@@ -30,21 +30,11 @@ cd backend
 python server.py
 
 ## Git 协作流程
-#1. 写代码前先拉取最新代码
 ```bash
+#1. 写代码前先拉取最新代码
 git pull
 
 #2.修改代码后提交上传
-git add .
-git commit -m "描述本次修改内容"
-git push
-
-## Git 协作流程
-1. 写代码前先拉取最新代码
-```bash
-git pull
-
-2.修改完成后提交上传
 git add .
 git commit -m "描述本次修改内容"
 git push
