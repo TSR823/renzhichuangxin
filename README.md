@@ -29,6 +29,7 @@ cd backend
 # 3. 启动服务
 python server.py
 
+```
 ## Git 协作流程
 ```bash
 #1. 写代码前先拉取最新代码
