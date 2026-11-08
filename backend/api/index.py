@@ -172,7 +172,8 @@ if __name__ == '__main__':
     # 适配本地调试和 Render 云端部署
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-
+# 在文件最底部加上这个
+app = app  # 暴露给 Vercel
 
 
 
