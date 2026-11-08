@@ -23,13 +23,16 @@ db = {
 }
 
 def init_data():
-    # 动态获取当前脚本所在目录，完美解决 Mac/Win/云端 路径不一致的问题
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    data_dir = os.path.join(base_dir, 'data')
-    
-    try:
-        # 加上 encoding='utf-8'，防止中文乱码
-        records_path = os.path.join(data_dir, '作答记录.csv')
+   import os
+
+# 获取当前 index.py 所在的目录（也就是 api 文件夹）
+base_dir = os.path.dirname(os.path.abspath(__file__))
+# 拼接 data 文件夹的路径
+data_dir = os.path.join(base_dir, 'data')
+
+# 后面的代码保持不变
+try:
+    records_path = os.path.join(data_dir, '作答记录.csv')
         materials_path = os.path.join(data_dir, '题目与材料.csv')
         
         db["records"] = pd.read_csv(records_path, encoding='utf-8')
