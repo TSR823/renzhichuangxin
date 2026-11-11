@@ -1410,7 +1410,7 @@
 <header class="topbar">
   <div class="topbar-inner">
     <button class="brand" type="button" id="brandLink" aria-haspopup="true" aria-expanded="false" aria-controls="agentPopover" title="点击查看智能体说明">
-      <span class="brand-logo"><img src="../创图/logo.jpg" alt="数小伴 Logo"></span>
+      <span class="brand-logo"><img src="../chuangtu/logo.jpg" alt="数小伴 Logo"></span>
       <span class="brand-name">数小伴</span>
       <span class="brand-caret" aria-hidden="true">▼</span>
     </button>
@@ -1517,7 +1517,7 @@
       </div>
       <div class="hero-card">
         <div class="hero-head">
-          <span class="hero-mascot" aria-hidden="true"><img src="../创图/logo.jpg" alt=""></span>
+          <span class="hero-mascot" aria-hidden="true"><img src="../chuangtu/logo.jpg" alt=""></span>
           <h1 class="hero-title" id="heroTitle" tabindex="0" title="点击查看智能体说明">欢迎使用「数小伴」</h1>
         </div>
       </div>
@@ -2088,11 +2088,11 @@
         return;
       }
       if(page === '学习梳理'){
-        window.location.href = '../学习梳理/index.html';
+        window.location.href = '../xuexishuli/index.html';
         return;
       }
       if(page === '案例核对'){
-        window.location.href = '../案例核对/index.html';
+        window.location.href = '../anlihedui/index.html';
         return;
       }
       toast('「' + page + '」页面建设中，敬请期待');
@@ -2105,11 +2105,11 @@
     link.addEventListener('click', function(event){
       event.preventDefault();
       if(link.dataset.module === '学习梳理'){
-        window.location.href = '../学习梳理/index.html';
+        window.location.href = '../xuexishuli/index.html';
         return;
       }
       if(link.dataset.module === '案例核对'){
-        window.location.href = '../案例核对/index.html';
+        window.location.href = '../anlihedui/index.html';
         return;
       }
       sideLinks.forEach(function(item){ item.classList.remove('is-active'); });
@@ -2235,11 +2235,11 @@
     btn.addEventListener('click', function(event){
       event.preventDefault();
       if(btn.dataset.module === '学习内容梳理'){
-        window.location.href = '../学习梳理/index.html';
+        window.location.href = '../xuexishuli/index.html';
         return;
       }
       if(btn.dataset.module === '案例核对 & 证据溯源'){
-        window.location.href = '../案例核对/index.html';
+        window.location.href = '../anlihedui/index.html';
         return;
       }
       toast('「' + btn.dataset.module + '」模块建设中，敬请期待');
