@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>学习内容梳理 · 数小伴</title>
+<link rel="stylesheet" href="vendor/element-plus.css">
+<style>
+  :root{
+    --bg:#F4FBF8;
+    --primary:#62B89B;
+    --primary-deep:#3E8F76;
+    --primary-soft:#E8F6F1;
+    --primary-line:#BFE5D8;
+    --ink:#333333;
+    --muted:#8A9A95;
+    --line:#EAF2EF;
+    --radius:16px;
+    --shadow:0 4px 12px rgba(0,0,0,.03);
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{margin:0;padding:0;}
+
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Segoe UI","Segoe UI Emoji",sans-serif;
+    font-size:14px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{color:inherit;text-decoration:none;}
+
+  /* ---------- 顶部导航（与页面一一致） ---------- */
+  .topbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:linear-gradient(90deg,#E6F8F1 0%,#F6FDFA 52%,#E4F7EF 100%);
+    border-bottom:1px solid #C6EADF;
+    box-shadow:0 2px 14px rgba(63,174,147,.09);
+    backdrop-filter:blur(10px);
+  }
+
+  .topbar-inner{
+    max-width:1440px;
+    margin:0 auto;
+    height:62px;
+    padding:0 32px;
+    display:flex;
+    align-items:center;
+    gap:34px;
+  }
+
+  .brand{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .brand-logo{
+    width:38px;
+    height:38px;
+    overflow:hidden;
+    border-radius:11px;
+    border:1px solid #BFE9DA;
+    background:linear-gradient(135deg,#FFFFFF,#D8F5EA);
+    display:grid;
+    place-items:center;
+    box-shadow:0 2px 8px rgba(63,174,147,.14);
+  }
+
+  .brand-logo img{display:block;width:100%;height:100%;object-fit:cover;}
+
+  .brand-name{
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:.5px;
+  }
+
+  .mainnav{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px;
+    min-width:0;
+  }
+
+  .nav-link{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:8px 12px;
+    border-radius:9px;
+    font-size:13px;
+    color:#708480;
+    white-space:nowrap;
+    transition:background .18s,color .18s;
+  }
+
+  .nav-link .ico{font-size:13px;opacity:.9;}
+
+  .nav-link:hover{background:rgba(111,211,183,.18);color:var(--primary-deep);}
+
+  .nav-link.is-active{
+    color:#175F4C;
+    font-weight:700;
+    background:linear-gradient(135deg,#D5F3E8,#ECFAF4);
+    box-shadow:inset 0 -2px 0 #3FAE93;
+  }
+
+  /* ---------- 左右布局 ---------- */
+  .layout{
+    max-width:1440px;
+    margin:0 auto;
+    padding:0 32px 44px;
+    display:flex;
+    align-items:flex-start;
+  }
+
+  .sidebar{
+    flex:0 0 208px;
+    width:208px;
+    border-right:1px solid var(--line);
+    padding:22px 24px 10px 0;
+    position:sticky;
+    top:78px;
+    max-height:calc(100vh - 96px);
+    overflow-y:auto;
+    align-self:flex-start;
+  }
+
+  .side-brand{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:0 0 14px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:12px;
+  }
+
+  .side-brand img{
+    width:26px;
+    height:26px;
+    border-radius:8px;
+    object-fit:cover;
+    border:1px solid var(--primary-line);
+  }
+
+  .side-brand span{font-size:13px;font-weight:700;letter-spacing:.3px;}
+
+  .side-menu{display:flex;flex-direction:column;gap:2px;}
+
+  .side-item{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:7px 9px;
+    border-radius:8px;
+    font-size:12.5px;
+    color:#4E6862;
+    border:0;
+    background:none;
+    text-align:left;
+    cursor:pointer;
+    transition:background .18s,color .18s;
+  }
+
+  .side-item .ico{font-size:13px;}
+
+  .side-item:hover{background:#F2FAF7;color:var(--primary-deep);}
+
+  .side-item.is-active{
+    background:var(--primary-soft);
+    color:#1F6B55;
+    font-weight:700;
+    box-shadow:inset 2px 0 0 var(--primary);
+  }
+
+  /* ---------- 主内容区 ---------- */
+  .main{
+    flex:1;
+    min-width:0;
+    padding:20px 0 0 32px;
+  }
+
+  .page-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:18px;
+  }
+
+  .page-title{
+    margin:0;
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.4px;
+  }
+
+  .page-sub{
+    margin:5px 0 0;
+    font-size:12.5px;
+    color:var(--muted);
+  }
+
+  .head-actions{display:flex;gap:10px;}
+
+  .ghost-btn{
+    --el-button-bg-color:transparent;
+    --el-button-border-color:#8FD3BF;
+    --el-button-text-color:var(--primary-deep);
+    --el-button-hover-bg-color:var(--primary-soft);
+    --el-button-hover-border-color:var(--primary);
+    --el-button-hover-text-color:#2F7A63;
+    --el-button-active-bg-color:#DFF3EC;
+    --el-button-active-border-color:var(--primary);
+    --el-button-active-text-color:#2F7A63;
+    border-radius:10px;
+    font-size:12.5px;
+    padding:8px 16px;
+  }
+
+  .card{
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:20px 22px;
+    margin-bottom:18px;
+  }
+
+  /* ---------- 主题范围卡片 ---------- */
+  .scope-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:24px;
+  }
+
+  .scope-label{
+    margin:0 0 4px;
+    font-size:12px;
+    color:var(--muted);
+  }
+
+  .scope-value{
+    margin:0;
+    font-size:15.5px;
+    font-weight:700;
+  }
+
+  .scope-value em{
+    font-style:normal;
+    color:var(--primary-deep);
+  }
+
+  .scope-tag{
+    display:inline-block;
+    margin-left:6px;
+    padding:1px 8px;
+    border-radius:6px;
+    background:var(--primary-soft);
+    color:var(--primary-deep);
+    font-size:11.5px;
+    font-weight:700;
+    vertical-align:2px;
+  }
+
+  .scope-source{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    max-width:430px;
+    padding:9px 12px;
+    border-radius:10px;
+    background:#F8FCFA;
+    border:1px dashed #D9EDE5;
+  }
+
+  .scope-source .ico{font-size:14px;line-height:1.5;}
+
+  .scope-source p{margin:0;font-size:11.5px;line-height:1.7;color:#71857F;}
+
+  .scope-source b{color:#3F5B54;font-weight:600;}
+
+  .scope-divider{
+    height:1px;
+    background:var(--line);
+    margin:16px 0 13px;
+  }
+
+  .filter-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  .filter-label{font-size:11.5px;color:var(--muted);margin-right:2px;}
+
+  .chip{
+    padding:5px 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:#6B837C;
+    font-size:12px;
+    cursor:pointer;
+    transition:all .18s;
+  }
+
+  .chip:hover{border-color:var(--primary-line);color:var(--primary-deep);}
+
+  .chip.is-active{
+    background:var(--primary-soft);
+    border-color:var(--primary-line);
+    color:#1F6B55;
+    font-weight:700;
+  }
+
+  /* ---------- 表格卡片 ---------- */
+  .card-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:14px;
+  }
+
+  .card-title{
+    margin:0;
+    font-size:14.5px;
+    font-weight:800;
+    letter-spacing:.2px;
+  }
+
+  .card-note{font-size:11.5px;color:var(--muted);}
+
+  .table-card .el-table{
+    --el-table-border-color:#F0F5F2;
+    --el-table-header-bg-color:#F1F8F5;
+    --el-table-row-hover-bg-color:#F3FBF8;
+    --el-table-text-color:#3F5450;
+    --el-table-header-text-color:#3E5C55;
+    font-size:12.5px;
+    border-radius:10px;
+  }
+
+  .table-card .el-table th.el-table__cell{
+    font-weight:700;
+    font-size:12px;
+    padding:10px 0;
+    background:#F1F8F5;
+  }
+
+  .table-card .el-table td.el-table__cell{padding:11px 0;}
+
+  .table-card .el-table__body tr{cursor:pointer;}
+
+  .table-card .el-table__body tr:hover>td.el-table__cell{background:#F3FBF8;}
+
+  .table-card .el-table::before,
+  .table-card .el-table__inner-wrapper::before{display:none;}
+
+  .mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:11.5px;color:#4A6B62;}
+
+  .topic-pill{
+    display:inline-block;
+    padding:1px 8px;
+    border-radius:6px;
+    background:#F2FAF7;
+    color:#3E8F76;
+    font-size:11px;
+    font-weight:600;
+  }
+
+  /* ---------- 弹窗 ---------- */
+  .detail-dialog .el-dialog,
+  .el-dialog.detail-dialog{
+    border-radius:16px;
+    padding:0;
+    overflow:hidden;
+  }
+
+  .detail-dialog .el-dialog__header,
+  .el-dialog.detail-dialog .el-dialog__header{
+    margin:0;
+    padding:18px 22px 14px;
+    border-bottom:1px solid var(--line);
+  }
+
+  .detail-dialog .el-dialog__title{font-size:15px;font-weight:800;color:var(--ink);}
+
+  .detail-dialog .el-dialog__headerbtn{top:16px;right:16px;}
+
+  .detail-dialog .el-dialog__body{padding:18px 22px 22px;}
+
+  .block + .block{margin-top:18px;}
+
+  .block-title{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin:0 0 8px;
+    font-size:12.5px;
+    font-weight:700;
+    color:#33534B;
+  }
+
+  .block-title i{
+    width:3px;
+    height:13px;
+    border-radius:2px;
+    background:var(--primary);
+    display:inline-block;
+  }
+
+  .std-quote{
+    margin:0;
+    padding:12px 14px;
+    border-left:3px solid var(--primary);
+    border-radius:0 10px 10px 0;
+    background:#F6FCFA;
+    font-size:12.5px;
+    line-height:1.85;
+    color:#405B54;
+  }
+
+  .std-quote .meta{
+    display:block;
+    margin-top:6px;
+    font-size:11px;
+    color:#8FA39D;
+  }
+
+  .material-card{
+    border:1px solid var(--primary-line);
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+  }
+
+  .material-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 14px;
+    background:#F1F8F5;
+    font-size:11.5px;
+    color:#5C7A71;
+  }
+
+  .material-bar b{color:#2F6F5B;font-size:12px;}
+
+  .material-body{padding:14px 16px;}
+
+  .material-stem{
+    margin:0;
+    font-size:12.5px;
+    line-height:1.9;
+    color:#3D514D;
+  }
+
+  .material-figure{
+    margin-top:12px;
+    padding:18px;
+    border-radius:10px;
+    background:repeating-linear-gradient(45deg,#FAFEFC,#FAFEFC 8px,#F4FBF8 8px,#F4FBF8 16px);
+    border:1px dashed #D5EBE3;
+    text-align:center;
+    font-size:11px;
+    color:#9AAEA7;
+  }
+
+  .dialog-foot{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+    font-size:11px;
+    color:var(--muted);
+  }
+
+  /* ---------- 依赖关系图 ---------- */
+  .graph-box{width:100%;height:340px;}
+
+  .graph-legend{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-size:11px;
+    color:var(--muted);
+  }
+
+  .graph-legend span{display:inline-flex;align-items:center;gap:5px;}
+
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+
+  .dot--start{background:#A8E4D2;}
+  .dot--core{background:#62B89B;}
+
+  @media (max-width:1200px){
+    .mainnav{overflow-x:auto;scrollbar-width:none;}
+    .mainnav::-webkit-scrollbar{display:none;}
+    .nav-link{padding:8px 9px;font-size:12.5px;}
+    .topbar-inner{gap:18px;}
+  }
+
+  @media (max-width:1080px){
+    .topbar-inner{padding:0 20px;gap:16px;}
+    .main{padding:18px 0 0 24px;}
+    .scope-top{flex-direction:column;gap:12px;}
+    .scope-source{max-width:none;}
+  }
+
+  @media (max-width:960px){
+    .layout{flex-direction:column;padding:0 20px 32px;gap:18px;}
+    .sidebar{
+      position:static;
+      flex:0 0 auto;
+      width:100%;
+      max-height:none;
+      padding:16px 0 8px;
+      border-right:0;
+      border-bottom:1px solid var(--line);
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px 16px;
+      align-items:start;
+    }
+    .side-brand,.side-menu{grid-column:1/-1;}
+    .main{padding:4px 0 0;}
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- 顶部导航 -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../首页/index.html">
+        <span class="brand-logo"><img src="../创图/logo.jpg" alt="数小伴 Logo"></span>
+        <span class="brand-name">数小伴</span>
+      </a>
+      <nav class="mainnav" aria-label="主导航">
+        <a class="nav-link" href="../首页/index.html"><span class="ico">🏠</span>首页</a>
+        <a class="nav-link is-active" href="#"><span class="ico">📚</span>学习梳理</a>
+        <a class="nav-link" href="#"><span class="ico">📈</span>学情分析</a>
+        <a class="nav-link" href="#"><span class="ico">💡</span>学习建议</a>
+        <a class="nav-link" href="../案例核对/index.html"><span class="ico">🧾</span>案例核对</a>
+        <a class="nav-link" href="#"><span class="ico">⚙️</span>设置</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- 左侧边栏 -->
+    <aside class="sidebar">
+      <div class="side-brand">
+        <img src="../创图/logo.jpg" alt="">
+        <span>数小伴</span>
+      </div>
+      <nav class="side-menu">
+        <button
+          v-for="item in menus"
+          :key="item.key"
+          class="side-item"
+          :class="{ 'is-active': item.key === 'content' }"
+          type="button"
+          @click="handleMenu(item)">
+          <span class="ico">{{ item.icon }}</span>{{ item.label }}
+        </button>
+      </nav>
+    </aside>
+
+    <!-- 主内容 -->
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">学习内容梳理</h1>
+          <p class="page-sub">构建结构化学习要求清单</p>
+        </div>
+        <div class="head-actions">
+          <el-button class="ghost-btn" @click="exportJson">导出 JSON</el-button>
+          <el-button class="ghost-btn" @click="exportCsv">导出 CSV</el-button>
+        </div>
+      </div>
+
+      <!-- 主题范围 -->
+      <scope-card
+        :topics="topics"
+        v-model="activeTopic"
+        :count="filteredRows.length"
+        :total="rows.length"></scope-card>
+
+      <!-- 结构化表格 -->
+      <section class="card table-card">
+        <div class="card-head">
+          <h2 class="card-title">结构化学习要求清单</h2>
+          <span class="card-note">点击任意一行可查看课标原文与材料溯源</span>
+        </div>
+        <content-table :rows="filteredRows" @row-click="openDetail"></content-table>
+      </section>
+
+      <!-- 知识点依赖 -->
+      <section class="card">
+        <div class="card-head">
+          <h2 class="card-title">前置知识点依赖关系</h2>
+          <div class="graph-legend">
+            <span><i class="dot dot--start"></i>基础知识点</span>
+            <span><i class="dot dot--core"></i>核心知识点</span>
+          </div>
+        </div>
+        <dependency-graph></dependency-graph>
+      </section>
+    </main>
+  </div>
+
+  <!-- 详情弹窗 -->
+  <detail-dialog v-model="dialogVisible" :row="activeRow"></detail-dialog>
+</div>
+
+<script src="vendor/vue.global.prod.js"></script>
+<script src="vendor/element-plus.js"></script>
+<script src="vendor/echarts.min.js"></script>
+<script>
+(function(){
+  var app = Vue.createApp({
+    data: function(){
+      return {
+        menus: [
+          { key: 'content', label: '学习梳理', icon: '📚' },
+          { key: 'analysis', label: '学情分析', icon: '📈' },
+          { key: 'advice', label: '学习建议', icon: '💡' },
+          { key: 'check', label: '案例核对', icon: '🧾' }
+        ],
+        topics: ['全部', '代数式与整式运算', '方程与方程组', '不等式与不等式组'],
+        activeTopic: '全部',
+        dialogVisible: false,
+        activeRow: null,
+        rows: MOCK_ROWS
+      };
+    },
+    computed: {
+      filteredRows: function(){
+        var self = this;
+        if(this.activeTopic === '全部') return this.rows;
+        return this.rows.filter(function(row){ return row.topic === self.activeTopic; });
+      }
+    },
+    methods: {
+      handleMenu: function(item){
+        if(item.key === 'content') return;
+        if(item.key === 'check'){
+          window.location.href = '../案例核对/index.html';
+          return;
+        }
+        ElementPlus.ElMessage({
+          message: '「' + item.label + '」页面建设中，敬请期待',
+          type: 'info',
+          customClass: 'soft-msg'
+        });
+      },
+      openDetail: function(row){
+        this.activeRow = row;
+        this.dialogVisible = true;
+      },
+      exportJson: function(){
+        var data = JSON.stringify(this.filteredRows, null, 2);
+        download('学习要求清单.json', data, 'application/json');
+        ElementPlus.ElMessage.success('已导出 JSON（' + this.filteredRows.length + ' 条）');
+      },
+      exportCsv: function(){
+        var headers = ['topic_id', '学习主题', '学习内容', '对应课标要求', '材料编号', '出处/定位', '前置关联知识点'];
+        var keys = ['topicId', 'topic', 'content', 'standard', 'materials', 'source', 'prereq'];
+        var lines = [headers.join(',')];
+        this.filteredRows.forEach(function(row){
+          lines.push(keys.map(function(key){
+            return '"' + String(row[key]).replace(/"/g, '""') + '"';
+          }).join(','));
+        });
+        download('学习要求清单.csv', '\uFEFF' + lines.join('\r\n'), 'text/csv');
+        ElementPlus.ElMessage.success('已导出 CSV（' + this.filteredRows.length + ' 条）');
+      }
+    }
+  });
+
+  function download(filename, content, mime){
+    var blob = new Blob([content], { type: mime + ';charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  /* ---------- 数据 ---------- */
+  app.component('scope-card', {
+    props: {
+      topics: { type: Array, required: true },
+      modelValue: { type: String, required: true },
+      count: { type: Number, default: 0 },
+      total: { type: Number, default: 0 }
+    },
+    emits: ['update:modelValue'],
+    template: `
+      <section class="card">
+        <div class="scope-top">
+          <div>
+            <p class="scope-label">当前分析主题范围</p>
+            <p class="scope-value">七年级数学（<em>2 次模拟</em>）<span class="scope-tag">课标 2022 版</span></p>
+          </div>
+          <div class="scope-source">
+            <span class="ico">📎</span>
+            <p>学习资料（<b>5_课程标准及相关教学资源</b>）：包含 <b>2022 年版义务教育数学课程标准</b>及<b>人教版七年级相关教材切片</b>。<br>题目中含 <b>18 道解答题</b>，附作答过程与分点评分。</p>
+          </div>
+        </div>
+        <div class="scope-divider"></div>
+        <div class="filter-row">
+          <span class="filter-label">主题筛选</span>
+          <button
+            v-for="topic in topics"
+            :key="topic"
+            class="chip"
+            :class="{ 'is-active': topic === modelValue }"
+            type="button"
+            @click="$emit('update:modelValue', topic)">
+            {{ topic }}
+          </button>
+          <span class="card-note" style="margin-left:auto">当前展示 {{ count }} / {{ total }} 条</span>
+        </div>
+      </section>
+    `
+  });
+
+  app.component('content-table', {
+    props: { rows: { type: Array, required: true } },
+    emits: ['row-click'],
+    data: function(){
+      return {
+        headerStyle: {
+          background: '#F1F8F5',
+          color: '#3E5C55',
+          fontWeight: '700',
+          fontSize: '12px'
+        }
+      };
+    },
+    template: `
+      <el-table
+        :data="rows"
+        :header-cell-style="headerStyle"
+        :default-sort="{ prop: 'topicId', order: 'ascending' }"
+        style="width:100%"
+        @row-click="handleRow">
+        <el-table-column prop="topicId" label="topic_id" width="108" sortable>
+          <template #default="scope">
+            <span class="mono">{{ scope.row.topicId }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="topic" label="学习主题" width="150">
+          <template #default="scope">
+            <span class="topic-pill">{{ scope.row.topic }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="content" label="学习内容" width="196" show-overflow-tooltip />
+        <el-table-column prop="standard" label="对应课标要求" min-width="246" show-overflow-tooltip />
+        <el-table-column prop="materials" label="材料编号" width="100">
+          <template #default="scope">
+            <span class="mono">{{ scope.row.materials }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="source" label="出处/定位" width="180" show-overflow-tooltip />
+        <el-table-column prop="prereq" label="前置关联知识点" width="158" show-overflow-tooltip />
+      </el-table>
+    `,
+    methods: {
+      handleRow: function(row){
+        this.$emit('row-click', row);
+      }
+    }
+  });
+
+  app.component('detail-dialog', {
+    props: {
+      modelValue: { type: Boolean, default: false },
+      row: { type: Object, default: null }
+    },
+    emits: ['update:modelValue'],
+    computed: {
+      visible: {
+        get: function(){ return this.modelValue; },
+        set: function(value){ this.$emit('update:modelValue', value); }
+      }
+    },
+    template: `
+      <el-dialog
+        v-model="visible"
+        title="内容详情与溯源"
+        width="620px"
+        class="detail-dialog"
+        append-to-body
+        destroy-on-close>
+        <template v-if="row">
+          <div class="block">
+            <h3 class="block-title"><i></i>原始课标片段</h3>
+            <p class="std-quote">
+              {{ row.standardText }}
+              <span class="meta">{{ row.standardSource }}</span>
+            </p>
+          </div>
+          <div class="block">
+            <h3 class="block-title"><i></i>对应配套材料预览</h3>
+            <div class="material-card">
+              <div class="material-bar">
+                <span>材料编号：<b>{{ row.materials }}</b></span>
+                <span>{{ row.topic }} · {{ row.content }}</span>
+              </div>
+              <div class="material-body">
+                <p class="material-stem">{{ row.materialStem }}</p>
+                <div class="material-figure">配套图示占位（教材原图待接入）</div>
+              </div>
+            </div>
+          </div>
+          <div class="dialog-foot">
+            <span>{{ row.topicId }} · {{ row.source }}</span>
+            <span>前置：{{ row.prereq }}</span>
+          </div>
+        </template>
+      </el-dialog>
+    `
+  });
+
+  app.component('dependency-graph', {
+    mounted: function(){
+      var self = this;
+      this.chart = echarts.init(this.$refs.canvas);
+      this.chart.setOption(buildGraphOption());
+      this.onResize = function(){ self.chart && self.chart.resize(); };
+      window.addEventListener('resize', this.onResize);
+    },
+    beforeUnmount: function(){
+      window.removeEventListener('resize', this.onResize);
+      if(this.chart){ this.chart.dispose(); this.chart = null; }
+    },
+    template: '<div class="graph-box" ref="canvas"></div>'
+  });
+
+  function gradient(from, to){
+    return new echarts.graphic.LinearGradient(0, 0, 1, 1, [
+      { offset: 0, color: from },
+      { offset: 1, color: to }
+    ]);
+  }
+
+  function buildGraphOption(){
+    var treeData = colorize({
+      name: '有理数运算',
+      children: [{
+        name: '代数式与整式',
+        children: [{
+          name: '一元一次方程',
+          children: [{
+            name: '一元一次不等式',
+            children: [{ name: '不等式组解集' }]
+          }, {
+            name: '二元一次方程组',
+            children: [{ name: '实际应用建模' }]
+          }]
+        }]
+      }]
+    }, 0);
+
+    function colorize(node, depth){
+      var colors = [
+        ['#D9F6EC', '#C0EFE0'],
+        ['#B8EDDC', '#9FE4CE'],
+        ['#6FC5A9', '#5BB89C'],
+        ['#5FB69A', '#4FA98E'],
+        ['#429A80', '#378A72']
+      ];
+      var pair = colors[Math.min(depth, colors.length - 1)];
+      node.itemStyle = {
+        color: gradient(pair[0], pair[1]),
+        borderWidth: 0,
+        shadowBlur: 10,
+        shadowColor: 'rgba(98,184,155,.16)'
+      };
+      node.label = { show: true, color: depth <= 1 ? '#215146' : '#FFFFFF' };
+      if(node.children){
+        node.children.forEach(function(child){ colorize(child, depth + 1); });
+      }
+      return node;
+    }
+
+    return {
+      animationDuration: 700,
+      tooltip: {
+        backgroundColor: '#FFFFFF',
+        borderColor: '#D8EDE5',
+        textStyle: { color: '#3D514D', fontSize: 12 },
+        extraCssText: 'box-shadow:0 6px 18px rgba(0,0,0,.06);border-radius:10px;'
+      },
+      series: [{
+        type: 'tree',
+        data: [treeData],
+        orient: 'TB',
+        left: 20,
+        right: 20,
+        top: 18,
+        bottom: 18,
+        symbol: 'roundRect',
+        symbolSize: [118, 34],
+        initialTreeDepth: -1,
+        expandAndCollapse: false,
+        roam: false,
+        edgeShape: 'curve',
+        edgeForkPosition: '58%',
+        lineStyle: {
+          color: '#BFE5D8',
+          width: 1.6,
+          curveness: 0.5
+        },
+        label: {
+          show: true,
+          position: 'inside',
+          fontSize: 10.5,
+          fontWeight: 600,
+          color: '#FFFFFF'
+        },
+        leaves: {
+          label: { position: 'inside', fontSize: 10.5 }
+        },
+        emphasis: {
+          focus: 'descendant'
+        },
+        animationDuration: 700,
+        animationDurationUpdate: 500
+      }]
+    };
+  }
+
+  /* ---------- Mock 数据 ---------- */
+  var MOCK_ROWS = [
+    {
+      topicId: 'T01',
+      topic: '代数式与整式运算',
+      content: '表示数量关系并代入求值',
+      standard: '能用代数式表示简单数量关系，代入求值，并进行整式加减与解释。',
+      materials: 'CR01',
+      source: '上册68—109',
+      prereq: '有理数运算',
+      standardText: '能用代数式表示简单数量关系，代入求值，并进行整式加减与解释；理解整式加减的算理，发展运算能力与符号意识。',
+      standardSource: '义务教育数学课程标准（2022 年版）· 第三学段「数与代数」· 课标 P62',
+      materialStem: '【解答题 · 6 分】用代数式表示：某商品原价 a 元，先提价 10%，再打八折出售，求现价；当 a = 200 时，求现价。要求写出列式过程与代入求值步骤。',
+      sortIndex: 1
+    },
+    {
+      topicId: 'T01',
+      topic: '代数式与整式运算',
+      content: '识别同类项、去括号并化简',
+      standard: '能用代数式表示简单数量关系，代入求值，并进行整式加减与解释。',
+      materials: 'CR01',
+      source: '上册68—109',
+      prereq: '表示数量关系并代入求值',
+      standardText: '理解同类项的概念，掌握去括号法则，能进行整式的加减运算，并在化简过程中体会运算律的作用。',
+      standardSource: '义务教育数学课程标准（2022 年版）· 第三学段「数与代数」· 课标 P62',
+      materialStem: '【解答题 · 8 分】先化简，再求值：3(2x² − xy) − 2(3x² − 2xy)，其中 x = −1，y = 2。评分点：去括号、合并同类项、代入计算。',
+      sortIndex: 2
+    },
+    {
+      topicId: 'T01',
+      topic: '代数式与整式运算',
+      content: '用整式解释具体问题',
+      standard: '能用代数式表示简单数量关系，代入求值，并进行整式加减与解释。',
+      materials: 'CR01',
+      source: '上册68—109',
+      prereq: '识别同类项、去括号并化简',
+      standardText: '能根据具体情境列出整式，并用整式解释实际问题的数量关系，体会用字母表示数的意义。',
+      standardSource: '义务教育数学课程标准（2022 年版）· 第三学段「数与代数」· 课标 P62',
+      materialStem: '【解答题 · 8 分】用整式解释：一个两位数，十位数字为 a，个位数字为 b，说明这个两位数可表示为 10a + b，并解释 10a + b 的实际意义。',
+      sortIndex: 3
+    },
+    {
+      topicId: 'T02',
+      topic: '方程与方程组',
+      content: '运用等式性质解一元一次方程',
+      standard: '能解一元一次方程和二元一次方程组，依据等量关系建立模型并检验答案。',
+      materials: 'CR02',
+      source: '上册110—148；下册87—119',
+      prereq: '整式加减、等式性质',
+      standardText: '掌握等式的基本性质，能解一元一次方程，理解解方程过程中每一步变形的依据，体会化归思想。',
+      standardSource: '义务教育数学课程标准（2022 年版）· 第三学段「数与代数」· 课标 P63',
+      materialStem: '【解答题 · 8 分】解方程：2(x − 3) = 3x + 4，并写出每一步变形的依据。评分点：去括号、移项、合并同类项、系数化为 1。',
+      sortIndex: 4
+    },
+    {
+      topicId: 'T02',
+      topic: '方程与方程组',
+      content: '用消元法解二元一次方程组',
+      standard: '能解一元一次方程和二元一次方程组，依据等量关系建立模型并检验答案。',
+      materials: 'CR02',
+      source: '上册110—148；下册87—119',
+      prereq: '一元一次方程',
+      standardText: '能运用代入消元法或加减消元法解二元一次方程组，理解消元思想，能对解进行检验。',
+      standardSource: '义务教育数学课程标准（2022 年版）· 第三学段「数与代数」· 课标 P63',
+      materialStem: '【解答题 · 10 分】用消元法解方程组：{ 2x + 3y = 12；x − y = 1 }。要求写出消元过程与检验步骤。',
+      sortIndex: 5
+    },
+    {
+      topicId: 'T02',
+      topic: '方程与方程组',
+      content: '列方程或方程组解决简单实际问题并检验',
+      standard: '能解一元一次方程和二元一次方程组，依据等量关系建立模型并检验答案。',
+      materials: 'CR02',
+      source: '上册110—148；下册87—119',
+      prereq: '一元一次方程、二元一次方程组',
+      standardText: '能根据实际问题中的等量关系列方程或方程组，经历"实际问题—建立模型—求解—检验"的过程，增强应用意识。',
+      standardSource: '义务教育数学课程标准（2022 年版）· 第三学段「数与代数」· 课标 P63',
+      materialStem: '【解答题 · 10 分】甲、乙两地相距 240 km，两车同时相向而行，2 h 后相遇。已知甲车速度比乙车快 10 km/h，求两车速度。要求列方程（组）并检验。',
+      sortIndex: 6
+    },
+    {
+      topicId: 'T03',
+      topic: '不等式与不等式组',
+      content: '运用不等式性质求解，负数乘除时正确改变方向',
+      standard: '能解一元一次不等式及简单不等式组，表示解集，并解决范围约束问题。',
+      materials: 'CR03',
+      source: '下册120—145',
+      prereq: '等式性质、一元一次方程',
+      standardText: '掌握不等式的基本性质，能解一元一次不等式并在数轴上表示解集，特别注意不等式两边乘（或除以）同一个负数时不等号方向改变。',
+      standardSource: '义务教育数学课程标准（2022 年版）· 第三学段「数与代数」· 课标 P63',
+      materialStem: '【解答题 · 8 分】解不等式：−3x + 5 > 2x − 10，并在数轴上表示解集。评分点：移项、系数化为 1 时不等号方向变化。',
+      sortIndex: 7
+    },
+    {
+      topicId: 'T03',
+      topic: '不等式与不等式组',
+      content: '求两个一元一次不等式解集的交集',
+      standard: '能解一元一次不等式及简单不等式组，表示解集，并解决范围约束问题。',
+      materials: 'CR03',
+      source: '下册120—145',
+      prereq: '运用不等式性质求解',
+      standardText: '能解由两个一元一次不等式组成的不等式组，会借助数轴求各不等式解集的公共部分，体会数形结合思想。',
+      standardSource: '义务教育数学课程标准（2022 年版）· 第三学段「数与代数」· 课标 P63',
+      materialStem: '【解答题 · 8 分】求不等式组 { 2x − 1 > 3；5 − x ≥ 1 } 的解集，并用数轴表示其公共部分。',
+      sortIndex: 8
+    },
+    {
+      topicId: 'T03',
+      topic: '不等式与不等式组',
+      content: '根据实际限制列不等式并解释取值范围',
+      standard: '能解一元一次不等式及简单不等式组，表示解集，并解决范围约束问题。',
+      materials: 'CR03',
+      source: '下册120—145',
+      prereq: '求两个一元一次不等式解集的交集',
+      standardText: '能根据实际问题中的不等关系列出一元一次不等式（组），求解并结合实际意义解释取值范围的合理性。',
+      standardSource: '义务教育数学课程标准（2022 年版）· 第三学段「数与代数」· 课标 P63',
+      materialStem: '【解答题 · 10 分】某班用不超过 500 元购买单价 30 元的笔记本和单价 45 元的钢笔共 15 件，问最多能买多少支钢笔？要求列不等式并解释取值范围。',
+      sortIndex: 9
+    }
+  ];
+
+  app.use(ElementPlus).mount('#app');
+})();
+</script>
+</body>
+</html>
