@@ -1,13 +1,627 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>智慧学伴 · 学情数据分析</title>
-    <script type="module" crossorigin src="./assets/index-DsnqVnKe.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-0tp4wI_w.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>学情分析 · 数小伴</title>
+<link rel="stylesheet" href="../xuexishuli/vendor/element-plus.css">
+<style>
+  :root{
+    --bg:#F4FBF8;
+    --primary:#62B89B;
+    --primary-deep:#3E8F76;
+    --primary-soft:#E8F6F1;
+    --primary-line:#BFE5D8;
+    --ink:#333333;
+    --muted:#8A9A95;
+    --line:#EAF2EF;
+    --radius:16px;
+    --shadow:0 4px 12px rgba(0,0,0,.03);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Segoe UI","Segoe UI Emoji",sans-serif;
+    font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:linear-gradient(90deg,#E6F8F1 0%,#F6FDFA 52%,#E4F7EF 100%);
+    border-bottom:1px solid #C6EADF;
+    box-shadow:0 2px 14px rgba(63,174,147,.09);
+    backdrop-filter:blur(10px);
+  }
+  .topbar-inner{
+    max-width:1440px;margin:0 auto;height:62px;padding:0 32px;
+    display:flex;align-items:center;gap:34px;
+  }
+  .brand{flex:0 0 auto;display:flex;align-items:center;gap:10px;}
+  .brand-logo{
+    width:38px;height:38px;overflow:hidden;border-radius:11px;
+    border:1px solid #BFE9DA;
+    background:linear-gradient(135deg,#FFFFFF,#D8F5EA);
+    display:grid;place-items:center;
+    box-shadow:0 2px 8px rgba(63,174,147,.14);
+  }
+  .brand-logo img{display:block;width:100%;height:100%;object-fit:cover;}
+  .brand-name{font-size:15px;font-weight:700;letter-spacing:.5px;}
+  .mainnav{
+    flex:1;display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;
+  }
+  .nav-link{
+    display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:9px;
+    font-size:13px;color:#708480;white-space:nowrap;transition:background .18s,color .18s;
+  }
+  .nav-link .ico{font-size:13px;opacity:.9;}
+  .nav-link:hover{background:rgba(111,211,183,.18);color:var(--primary-deep);}
+  .nav-link.is-active{
+    color:#175F4C;font-weight:700;
+    background:linear-gradient(135deg,#D5F3E8,#ECFAF4);
+    box-shadow:inset 0 -2px 0 #3FAE93;
+  }
+
+  .layout{max-width:1440px;margin:0 auto;padding:0 32px 44px;display:flex;align-items:flex-start;}
+  .sidebar{
+    flex:0 0 208px;width:208px;border-right:1px solid var(--line);
+    padding:22px 24px 10px 0;position:sticky;top:78px;
+    max-height:calc(100vh - 96px);overflow-y:auto;align-self:flex-start;
+  }
+  .side-brand{
+    display:flex;align-items:center;gap:8px;padding:0 0 14px;
+    border-bottom:1px solid var(--line);margin-bottom:12px;
+  }
+  .side-brand img{width:26px;height:26px;border-radius:8px;object-fit:cover;border:1px solid var(--primary-line);}
+  .side-brand span{font-size:13px;font-weight:700;letter-spacing:.3px;}
+  .side-menu{display:flex;flex-direction:column;gap:2px;}
+  .side-item{
+    display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;
+    font-size:12.5px;color:#4E6862;border:0;background:none;text-align:left;cursor:pointer;
+    transition:background .18s,color .18s;
+  }
+  .side-item .ico{font-size:12.5px;}
+  .side-item:hover{background:#F2FAF7;color:var(--primary-deep);}
+  .side-item.is-active{
+    background:var(--primary-soft);color:#1F6B55;font-weight:700;
+    box-shadow:inset 2px 0 0 var(--primary);
+  }
+  .side-tools{
+    margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+    display:flex;flex-direction:column;gap:14px;
+  }
+  .field-label{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:11.5px;color:var(--muted);}
+  .side-select{
+    width:100%;appearance:none;-webkit-appearance:none;background-color:#fff;
+    border:1px solid var(--line);border-radius:9px;padding:8px 28px 8px 11px;
+    font-size:12.5px;color:var(--ink);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'><path d='M1 1.5L5 5.5L9 1.5' fill='none' stroke='%23708480' stroke-width='1.6' stroke-linecap='round'/></svg>");
+    background-repeat:no-repeat;background-position:right 10px center;background-size:10px 7px;
+    transition:border-color .18s,box-shadow .18s;
+  }
+  .side-select:hover{border-color:var(--primary);box-shadow:0 0 0 3px rgba(63,174,147,.14);}
+  .side-select:focus{outline:none;border-color:var(--primary);}
+  .tool-btn{
+    display:flex;align-items:center;justify-content:center;gap:7px;width:100%;
+    padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:#fff;
+    color:#3E5651;font-size:12.5px;cursor:pointer;
+    transition:background .18s,border-color .18s,color .18s,box-shadow .18s;
+  }
+  .tool-btn:hover{background:var(--primary);border-color:var(--primary);color:#1D4B40;box-shadow:0 4px 12px rgba(63,174,147,.28);}
+
+  .main{flex:1;min-width:0;padding:20px 0 0 32px;}
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px;}
+  .page-title{margin:0;font-size:22px;font-weight:800;letter-spacing:.4px;}
+  .page-sub{margin:5px 0 0;font-size:12.5px;color:var(--muted);}
+  .head-meta{
+    display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;
+    background:#fff;border:1px solid var(--line);font-size:11.5px;color:#6C837C;
+  }
+  .meta-dot{width:6px;height:6px;border-radius:50%;background:var(--primary);}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px;}
+  .kpi{
+    background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px 18px;border:1px solid transparent;transition:border-color .2s,box-shadow .2s;
+  }
+  .kpi:hover{border-color:var(--primary-line);box-shadow:0 6px 18px rgba(60,120,105,.07);}
+  .kpi-label{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+  .kpi-num{font-size:26px;font-weight:800;color:#2F6F5B;line-height:1.35;margin-top:4px;}
+  .kpi-num small{font-size:13px;font-weight:600;color:#79A296;margin-left:2px;}
+  .kpi-foot{font-size:11px;color:#98AAA5;margin-top:2px;}
+  .kpi.is-warn .kpi-num{color:#B87C16;}
+
+  .card{
+    background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px 18px 18px;margin-bottom:16px;
+  }
+  .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;}
+  .card-title{margin:0;font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .card-title i{width:4px;height:15px;border-radius:2px;background:var(--primary);display:inline-block;}
+  .card-note{font-size:11.5px;color:var(--muted);}
+
+  .chart-row{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;}
+  .chart-box{height:290px;width:100%;}
+
+  .table-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .search-input{
+    width:170px;border:1px solid var(--line);border-radius:9px;
+    padding:7px 11px;font-size:12.5px;color:var(--ink);
+  }
+  .search-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(63,174,147,.14);}
+
+  .stu-table .el-table__header th{
+    background:#F6FCFA !important;color:#5C7A71;font-weight:700;font-size:12px;
+  }
+  .stu-table .el-table__row{cursor:pointer;}
+  .stu-table .el-table__row:hover > td{background:#F7FCFA !important;}
+
+  .rate-cell{display:flex;align-items:center;gap:8px;}
+  .rate-num{font-size:12.5px;font-weight:700;color:#2F6F5B;min-width:46px;}
+  .rate-bar{flex:1;height:6px;border-radius:99px;background:#EDF5F2;overflow:hidden;min-width:56px;}
+  .rate-bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8FD8C1,#4FA98E);}
+  .rate-bar span.is-low{background:linear-gradient(90deg,#F3C98B,#DCA254);}
+
+  .stu-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .stu-avatar{
+    width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+    font-size:15px;font-weight:800;color:#2F7A63;
+    background:linear-gradient(135deg,#E6F8F1,#CDEFE2);border:1px solid var(--primary-line);
+  }
+  .stu-name{font-size:15px;font-weight:700;}
+  .stu-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+
+  .metric-list{display:flex;flex-direction:column;gap:10px;}
+  .metric-row{display:flex;align-items:center;gap:10px;}
+  .metric-name{font-size:11.5px;color:#5C7A71;width:132px;flex:0 0 132px;}
+  .metric-track{flex:1;height:8px;border-radius:99px;background:#EDF5F2;overflow:hidden;}
+  .metric-track span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8FD8C1,#4FA98E);}
+  .metric-track span.is-low{background:linear-gradient(90deg,#F3C98B,#DCA254);}
+  .metric-val{font-size:11.5px;font-weight:700;color:#2F6F5B;width:48px;text-align:right;}
+
+  .detail-dialog .el-dialog__body{padding:16px 20px 20px;}
+  .detail-dialog{border-radius:16px;}
+
+  @keyframes spinOnce{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .spin{display:inline-block;animation:spinOnce .6s linear infinite;}
+
+  @media (max-width:1080px){
+    .kpi-row{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .chart-row{grid-template-columns:1fr;}
+  }
+  @media (max-width:860px){
+    .layout{flex-direction:column;padding:0 16px 32px;}
+    .sidebar{width:100%;flex:none;border-right:0;border-bottom:1px solid var(--line);padding:16px 0;position:static;max-height:none;}
+    .main{padding:16px 0 0;}
+    .topbar-inner{padding:0 16px;gap:12px;}
+    .nav-link{padding:8px 9px;font-size:12.5px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../shouye/index.html">
+        <span class="brand-logo"><img src="../chuangtu/logo.jpg" alt="数小伴 Logo"></span>
+        <span class="brand-name">数小伴</span>
+      </a>
+      <nav class="mainnav" aria-label="主导航">
+        <a class="nav-link" href="../shouye/index.html"><span class="ico">🏠</span>首页</a>
+        <a class="nav-link" href="../xuexishuli/index.html"><span class="ico">📚</span>学习梳理</a>
+        <a class="nav-link is-active" href="../xueqingfenxi/index.html"><span class="ico">📈</span>学情分析</a>
+        <a class="nav-link" href="../xuexijianyi/index.html"><span class="ico">💡</span>学习建议</a>
+        <a class="nav-link" href="../anlihedui/index.html"><span class="ico">🧾</span>案例核对</a>
+        <a class="nav-link" href="#"><span class="ico">⚙️</span>设置</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-brand">
+        <img src="../chuangtu/logo.jpg" alt="">
+        <span>数小伴</span>
+      </div>
+
+      <nav class="side-menu">
+        <button class="side-item" type="button" @click="go('../xuexishuli/index.html')"><span class="ico">📚</span>学习梳理</button>
+        <button class="side-item is-active" type="button"><span class="ico">📈</span>学情分析</button>
+        <button class="side-item" type="button" @click="go('../xuexijianyi/index.html')"><span class="ico">💡</span>学习建议</button>
+        <button class="side-item" type="button" @click="go('../anlihedui/index.html')"><span class="ico">🧾</span>案例核对</button>
+      </nav>
+
+      <div class="side-tools">
+        <div>
+          <div class="field-label"><span class="ico">🏫</span>班级编号</div>
+          <select class="side-select" v-model="classCode">
+            <option value="DC01">DC01</option>
+            <option value="DC02">DC02</option>
+          </select>
+        </div>
+        <div>
+          <div class="field-label"><span class="ico">📚</span>主题筛选</div>
+          <select class="side-select" v-model="topic">
+            <option value="all">全部主题</option>
+            <option value="T01">代数式与整式运算</option>
+            <option value="T02">方程与方程组</option>
+            <option value="T03">不等式与不等式组</option>
+          </select>
+        </div>
+        <div>
+          <div class="field-label"><span class="ico">🔎</span>达标线</div>
+          <select class="side-select" v-model.number="passLine">
+            <option :value="60">60%</option>
+            <option :value="70">70%</option>
+            <option :value="80">80%</option>
+          </select>
+        </div>
+        <button class="tool-btn" type="button" @click="reload"><span :class="{spin:refreshing}">↻</span> 重载数据</button>
+        <button class="tool-btn" type="button" @click="go('../xuexijianyi/index.html')">💡 查看学习建议</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">学情分析</h1>
+          <p class="page-sub">按主题与指标拆解班级表现，定位薄弱环节</p>
+        </div>
+        <div class="head-meta"><i class="meta-dot"></i>当前班级：{{ classCode }} · {{ students.length }} 名学生</div>
+      </div>
+
+      <section class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label"><span>📊</span>班级平均得分率</div>
+          <div class="kpi-num">{{ avgRate }}<small>%</small></div>
+          <div class="kpi-foot">九项指标加权平均</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label"><span>✅</span>达标指标数</div>
+          <div class="kpi-num">{{ passedCount }}<small>/ 9</small></div>
+          <div class="kpi-foot">达到 {{ passLine }}% 达标线</div>
+        </div>
+        <div class="kpi" :class="{ 'is-warn': weakCount > 0 }">
+          <div class="kpi-label"><span>⚠️</span>薄弱指标数</div>
+          <div class="kpi-num">{{ weakCount }}<small>/ 9</small></div>
+          <div class="kpi-foot">低于 50%，需重点补强</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label"><span>🧑‍🎓</span>达标学生</div>
+          <div class="kpi-num">{{ passedStudents }}<small>人</small></div>
+          <div class="kpi-foot">平均得分率 ≥ {{ passLine }}%</div>
+        </div>
+      </section>
+
+      <section class="chart-row">
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><i></i>指标得分率</h2>
+            <span class="card-note">点击柱条可下钻查看指标说明</span>
+          </div>
+          <div class="chart-box" ref="barChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><i></i>三主题掌握对比</h2>
+            <span class="card-note">DC01 与 DC02 对比</span>
+          </div>
+          <div class="chart-box" ref="radarChart"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2 class="card-title"><i></i>学生明细</h2>
+          <div class="table-tools">
+            <input class="search-input" v-model="keyword" type="search" placeholder="搜索学生ID">
+            <span class="card-note">{{ filteredStudents.length }} / {{ students.length }} 人</span>
+          </div>
+        </div>
+        <el-table :data="filteredStudents" class="stu-table" size="small" style="width:100%" @row-click="openStudent">
+          <el-table-column prop="id" label="学生ID" width="92" />
+          <el-table-column label="平均得分率" min-width="190">
+            <template #default="scope">
+              <div class="rate-cell">
+                <span class="rate-num">{{ scope.row.avg.toFixed(1) }}%</span>
+                <span class="rate-bar"><span :class="{ 'is-low': scope.row.avg < 50 }" :style="{ width: Math.min(100, scope.row.avg) + '%' }"></span></span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="代数式与整式" width="128">
+            <template #default="scope"><span class="rate-num">{{ scope.row.T01.toFixed(0) }}%</span></template>
+          </el-table-column>
+          <el-table-column label="方程与方程组" width="128">
+            <template #default="scope"><span class="rate-num">{{ scope.row.T02.toFixed(0) }}%</span></template>
+          </el-table-column>
+          <el-table-column label="不等式" width="108">
+            <template #default="scope"><span class="rate-num">{{ scope.row.T03.toFixed(0) }}%</span></template>
+          </el-table-column>
+          <el-table-column label="状态" width="96">
+            <template #default="scope">
+              <el-tag :type="scope.row.avg >= passLine ? 'success' : (scope.row.avg >= 50 ? 'warning' : 'danger')" size="small">
+                {{ scope.row.avg >= passLine ? '达标' : (scope.row.avg >= 50 ? '临界' : '待提升') }}
+              </el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
+      </section>
+    </main>
+  </div>
+
+  <el-dialog v-model="detailVisible" :title="current ? (current.id + ' · 指标详情') : '指标详情'" width="560px" class="detail-dialog" append-to-body>
+    <template v-if="current">
+      <div class="stu-head">
+        <div class="stu-avatar">{{ current.id }}</div>
+        <div>
+          <div class="stu-name">{{ current.id }}</div>
+          <div class="stu-sub">{{ classCode }} · 平均得分率 {{ current.avg.toFixed(1) }}%</div>
+        </div>
+      </div>
+      <div class="metric-list">
+        <div v-for="m in current.metrics" :key="m.key" class="metric-row">
+          <span class="metric-name">{{ m.label }}</span>
+          <span class="metric-track"><span :class="{ 'is-low': m.value < 50 }" :style="{ width: Math.min(100, m.value) + '%' }"></span></span>
+          <span class="metric-val">{{ m.value.toFixed(0) }}%</span>
+        </div>
+      </div>
+    </template>
+  </el-dialog>
+</div>
+
+<script src="../xuexishuli/vendor/vue.global.prod.js"></script>
+<script src="../xuexishuli/vendor/element-plus.js"></script>
+<script src="../xuexishuli/vendor/echarts.min.js"></script>
+<script>
+(function(){
+  var ref = Vue.ref, computed = Vue.computed, watch = Vue.watch, onMounted = Vue.onMounted, reactive = Vue.reactive;
+
+  var CLASS_SCORES = {
+    DC01: { T01I1:48.10, T01I2:66.67, T01I3:50.72, T02I1:63.02, T02I2:62.09, T02I3:61.73, T03I1:60.36, T03I2:70.27, T03I3:46.67 },
+    DC02: { T01I1:57.14, T01I2:60.64, T01I3:56.86, T02I1:45.91, T02I2:51.06, T02I3:47.78, T03I1:60.42, T03I2:73.53, T03I3:41.67 }
+  };
+
+  var METRICS = [
+    { key:'T01I1', topic:'T01', label:'代数式·列式与代入' },
+    { key:'T01I2', topic:'T01', label:'整式·同类项与去括号' },
+    { key:'T01I3', topic:'T01', label:'代数式·规律与说明' },
+    { key:'T02I1', topic:'T02', label:'方程·等式性质与解' },
+    { key:'T02I2', topic:'T02', label:'方程组·消元求解' },
+    { key:'T02I3', topic:'T02', label:'方程·实际应用建模' },
+    { key:'T03I1', topic:'T03', label:'不等式·性质与解集' },
+    { key:'T03I2', topic:'T03', label:'不等式组·公共解集' },
+    { key:'T03I3', topic:'T03', label:'不等式·实际范围确定' }
+  ];
+
+  var TOPIC_NAME = { T01:'代数式与整式运算', T02:'方程与方程组', T03:'不等式与不等式组' };
+
+  function hash(n){
+    var x = Math.sin(n * 12.9898) * 43758.5453;
+    return x - Math.floor(x);
+  }
+
+  function studentIds(cls){
+    var start = cls === 'DC01' ? 1 : 21;
+    var list = [];
+    for(var i = 0; i < 20; i++){
+      list.push('D' + String(start + i).padStart(2, '0'));
+    }
+    return list;
+  }
+
+  function buildStudents(cls){
+    var base = CLASS_SCORES[cls];
+    return studentIds(cls).map(function(id, idx){
+      var metrics = METRICS.map(function(m){
+        var seed = idx * 97 + m.key.charCodeAt(1) * 31 + m.key.charCodeAt(3) * 17;
+        var jitter = (hash(seed) - 0.5) * 46;
+        var value = Math.max(12, Math.min(100, base[m.key] + jitter));
+        return { key:m.key, topic:m.topic, label:m.label, value:value };
+      });
+      var avg = metrics.reduce(function(s, m){ return s + m.value; }, 0) / metrics.length;
+      function topicAvg(t){
+        var arr = metrics.filter(function(m){ return m.topic === t; });
+        return arr.reduce(function(s, m){ return s + m.value; }, 0) / arr.length;
+      }
+      return {
+        id:id,
+        avg:avg,
+        T01:topicAvg('T01'),
+        T02:topicAvg('T02'),
+        T03:topicAvg('T03'),
+        metrics:metrics
+      };
+    });
+  }
+
+  var app = Vue.createApp({
+    setup: function(){
+      var classCode = ref('DC01');
+      var topic = ref('all');
+      var passLine = ref(60);
+      var keyword = ref('');
+      var refreshing = ref(false);
+      var detailVisible = ref(false);
+      var current = ref(null);
+      var barChart = ref(null);
+      var radarChart = ref(null);
+      var barIns = null, radarIns = null;
+
+      var students = computed(function(){ return buildStudents(classCode.value); });
+
+      var visibleMetrics = computed(function(){
+        if(topic.value === 'all') return METRICS;
+        return METRICS.filter(function(m){ return m.topic === topic.value; });
+      });
+
+      var classRates = computed(function(){
+        var base = CLASS_SCORES[classCode.value];
+        return visibleMetrics.value.map(function(m){
+          return { key:m.key, label:m.label, value:base[m.key] };
+        });
+      });
+
+      var avgRate = computed(function(){
+        var arr = classRates.value;
+        if(!arr.length) return '0.0';
+        return (arr.reduce(function(s, m){ return s + m.value; }, 0) / arr.length).toFixed(1);
+      });
+
+      var passedCount = computed(function(){
+        return classRates.value.filter(function(m){ return m.value >= passLine.value; }).length;
+      });
+
+      var weakCount = computed(function(){
+        return classRates.value.filter(function(m){ return m.value < 50; }).length;
+      });
+
+      var passedStudents = computed(function(){
+        return students.value.filter(function(s){ return s.avg >= passLine.value; }).length;
+      });
+
+      var filteredStudents = computed(function(){
+        var kw = keyword.value.trim().toUpperCase();
+        var arr = students.value.slice();
+        if(kw) arr = arr.filter(function(s){ return s.id.indexOf(kw) !== -1; });
+        return arr.sort(function(a, b){ return b.avg - a.avg; });
+      });
+
+      function renderBar(){
+        if(!barIns) return;
+        var rows = classRates.value;
+        barIns.setOption({
+          grid: { left: 12, right: 16, top: 24, bottom: 8, containLabel: true },
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' },
+            formatter: function(params){
+              var p = params[0];
+              return p.name + '<br/>得分率：<b>' + p.value.toFixed(2) + '%</b>';
+            }
+          },
+          xAxis: {
+            type: 'category',
+            data: rows.map(function(r){ return r.key; }),
+            axisLine: { lineStyle: { color: '#DCE9E4' } },
+            axisTick: { show: false },
+            axisLabel: { color: '#7C918B', fontSize: 11, interval: 0 }
+          },
+          yAxis: {
+            type: 'value', max: 100,
+            splitLine: { lineStyle: { color: '#F0F7F4' } },
+            axisLabel: { color: '#9AB0AA', fontSize: 10, formatter: '{value}%' }
+          },
+          series: [{
+            type: 'bar',
+            data: rows.map(function(r){
+              return { value: r.value, itemStyle: { color: r.value < 50 ? '#E0A458' : (r.value < passLine.value ? '#8FD8C1' : '#4FA98E') } };
+            }),
+            barMaxWidth: 30,
+            itemStyle: { borderRadius: [6, 6, 0, 0] }
+          }]
+        }, true);
+      }
+
+      function renderRadar(){
+        if(!radarIns) return;
+        function topicRates(cls){
+          var s = CLASS_SCORES[cls];
+          return ['T01','T02','T03'].map(function(t){
+            var keys = METRICS.filter(function(m){ return m.topic === t; }).map(function(m){ return m.key; });
+            return keys.reduce(function(acc, k){ return acc + s[k]; }, 0) / keys.length;
+          });
+        }
+        radarIns.setOption({
+          tooltip: { trigger: 'item' },
+          legend: { bottom: 0, itemWidth: 10, itemHeight: 10, textStyle: { color: '#6C837C', fontSize: 11 } },
+          radar: {
+            indicator: [
+              { name: '代数式与整式', max: 100 },
+              { name: '方程与方程组', max: 100 },
+              { name: '不等式与不等式组', max: 100 }
+            ],
+            radius: '62%',
+            center: ['50%', '46%'],
+            axisName: { color: '#6C837C', fontSize: 11 },
+            splitLine: { lineStyle: { color: '#E7F2ED' } },
+            splitArea: { areaStyle: { color: ['#FBFEFC', '#FFFFFF'] } },
+            axisLine: { lineStyle: { color: '#E7F2ED' } }
+          },
+          series: [{
+            type: 'radar',
+            symbolSize: 4,
+            data: [
+              { value: topicRates('DC01'), name: 'DC01', itemStyle: { color: '#4FA98E' }, areaStyle: { color: 'rgba(79,169,142,.22)' } },
+              { value: topicRates('DC02'), name: 'DC02', itemStyle: { color: '#9CC7B7' }, areaStyle: { color: 'rgba(156,199,183,.16)' } }
+            ]
+          }]
+        }, true);
+      }
+
+      function openStudent(row){
+        current.value = row;
+        detailVisible.value = true;
+      }
+
+      function go(url){
+        window.location.href = url;
+      }
+
+      function reload(){
+        refreshing.value = true;
+        setTimeout(function(){
+          renderBar();
+          renderRadar();
+          refreshing.value = false;
+          ElementPlus.ElMessage({ message:'已重载 ' + classCode.value + ' 的学情数据', type:'success', customClass:'soft-msg' });
+        }, 500);
+      }
+
+      onMounted(function(){
+        barIns = echarts.init(barChart.value);
+        radarIns = echarts.init(radarChart.value);
+        renderBar();
+        renderRadar();
+        window.addEventListener('resize', function(){
+          barIns && barIns.resize();
+          radarIns && radarIns.resize();
+        });
+      });
+
+      watch([classCode, topic, passLine], function(){
+        renderBar();
+        renderRadar();
+      });
+
+      return {
+        classCode: classCode,
+        topic: topic,
+        passLine: passLine,
+        keyword: keyword,
+        refreshing: refreshing,
+        detailVisible: detailVisible,
+        current: current,
+        barChart: barChart,
+        radarChart: radarChart,
+        students: students,
+        filteredStudents: filteredStudents,
+        avgRate: avgRate,
+        passedCount: passedCount,
+        weakCount: weakCount,
+        passedStudents: passedStudents,
+        openStudent: openStudent,
+        go: go,
+        reload: reload
+      };
+    }
+  });
+
+  app.use(ElementPlus);
+  app.mount('#app');
+})();
+</script>
+</body>
 </html>

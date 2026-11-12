@@ -1,13 +1,644 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>智慧学伴 · 学情数据分析</title>
-    <script type="module" crossorigin src="./assets/index-DsnqVnKe.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-0tp4wI_w.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>学习建议 · 数小伴</title>
+<link rel="stylesheet" href="../xuexishuli/vendor/element-plus.css">
+<style>
+  :root{
+    --bg:#F4FBF8;
+    --primary:#62B89B;
+    --primary-deep:#3E8F76;
+    --primary-soft:#E8F6F1;
+    --primary-line:#BFE5D8;
+    --ink:#333333;
+    --muted:#8A9A95;
+    --line:#EAF2EF;
+    --radius:16px;
+    --shadow:0 4px 12px rgba(0,0,0,.03);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Segoe UI","Segoe UI Emoji",sans-serif;
+    font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:linear-gradient(90deg,#E6F8F1 0%,#F6FDFA 52%,#E4F7EF 100%);
+    border-bottom:1px solid #C6EADF;
+    box-shadow:0 2px 14px rgba(63,174,147,.09);
+    backdrop-filter:blur(10px);
+  }
+  .topbar-inner{
+    max-width:1440px;margin:0 auto;height:62px;padding:0 32px;
+    display:flex;align-items:center;gap:34px;
+  }
+  .brand{flex:0 0 auto;display:flex;align-items:center;gap:10px;}
+  .brand-logo{
+    width:38px;height:38px;overflow:hidden;border-radius:11px;
+    border:1px solid #BFE9DA;
+    background:linear-gradient(135deg,#FFFFFF,#D8F5EA);
+    display:grid;place-items:center;
+    box-shadow:0 2px 8px rgba(63,174,147,.14);
+  }
+  .brand-logo img{display:block;width:100%;height:100%;object-fit:cover;}
+  .brand-name{font-size:15px;font-weight:700;letter-spacing:.5px;}
+  .mainnav{
+    flex:1;display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;
+  }
+  .nav-link{
+    display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:9px;
+    font-size:13px;color:#708480;white-space:nowrap;transition:background .18s,color .18s;
+  }
+  .nav-link .ico{font-size:13px;opacity:.9;}
+  .nav-link:hover{background:rgba(111,211,183,.18);color:var(--primary-deep);}
+  .nav-link.is-active{
+    color:#175F4C;font-weight:700;
+    background:linear-gradient(135deg,#D5F3E8,#ECFAF4);
+    box-shadow:inset 0 -2px 0 #3FAE93;
+  }
+
+  .layout{max-width:1440px;margin:0 auto;padding:0 32px 44px;display:flex;align-items:flex-start;}
+  .sidebar{
+    flex:0 0 208px;width:208px;border-right:1px solid var(--line);
+    padding:22px 24px 10px 0;position:sticky;top:78px;
+    max-height:calc(100vh - 96px);overflow-y:auto;align-self:flex-start;
+  }
+  .side-brand{
+    display:flex;align-items:center;gap:8px;padding:0 0 14px;
+    border-bottom:1px solid var(--line);margin-bottom:12px;
+  }
+  .side-brand img{width:26px;height:26px;border-radius:8px;object-fit:cover;border:1px solid var(--primary-line);}
+  .side-brand span{font-size:13px;font-weight:700;letter-spacing:.3px;}
+  .side-menu{display:flex;flex-direction:column;gap:2px;}
+  .side-item{
+    display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;
+    font-size:12.5px;color:#4E6862;border:0;background:none;text-align:left;cursor:pointer;
+    transition:background .18s,color .18s;
+  }
+  .side-item .ico{font-size:12.5px;}
+  .side-item:hover{background:#F2FAF7;color:var(--primary-deep);}
+  .side-item.is-active{
+    background:var(--primary-soft);color:#1F6B55;font-weight:700;
+    box-shadow:inset 2px 0 0 var(--primary);
+  }
+  .side-tools{
+    margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+    display:flex;flex-direction:column;gap:14px;
+  }
+  .field-label{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:11.5px;color:var(--muted);}
+  .side-select{
+    width:100%;appearance:none;-webkit-appearance:none;background-color:#fff;
+    border:1px solid var(--line);border-radius:9px;padding:8px 28px 8px 11px;
+    font-size:12.5px;color:var(--ink);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'><path d='M1 1.5L5 5.5L9 1.5' fill='none' stroke='%23708480' stroke-width='1.6' stroke-linecap='round'/></svg>");
+    background-repeat:no-repeat;background-position:right 10px center;background-size:10px 7px;
+    transition:border-color .18s,box-shadow .18s;
+  }
+  .side-select:hover{border-color:var(--primary);box-shadow:0 0 0 3px rgba(63,174,147,.14);}
+  .side-select:focus{outline:none;border-color:var(--primary);}
+  .tool-btn{
+    display:flex;align-items:center;justify-content:center;gap:7px;width:100%;
+    padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:#fff;
+    color:#3E5651;font-size:12.5px;cursor:pointer;
+    transition:background .18s,border-color .18s,color .18s,box-shadow .18s;
+  }
+  .tool-btn:hover{background:var(--primary);border-color:var(--primary);color:#1D4B40;box-shadow:0 4px 12px rgba(63,174,147,.28);}
+  .tool-btn--primary{
+    border:0;background:linear-gradient(135deg,#7FCFB6,#4FA98E);color:#fff;font-weight:700;
+    box-shadow:0 6px 14px rgba(79,169,142,.26);
+  }
+  .tool-btn--primary:hover{background:linear-gradient(135deg,#72C7AC,#469E84);color:#fff;}
+
+  .main{flex:1;min-width:0;padding:20px 0 0 32px;}
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px;}
+  .page-title{margin:0;font-size:22px;font-weight:800;letter-spacing:.4px;}
+  .page-sub{margin:5px 0 0;font-size:12.5px;color:var(--muted);}
+  .head-meta{
+    display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;
+    background:#fff;border:1px solid var(--line);font-size:11.5px;color:#6C837C;
+  }
+  .meta-dot{width:6px;height:6px;border-radius:50%;background:var(--primary);}
+
+  .card{
+    background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px 18px 18px;margin-bottom:16px;
+  }
+  .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+  .card-title{margin:0;font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .card-title i{width:4px;height:15px;border-radius:2px;background:var(--primary);display:inline-block;}
+  .card-note{font-size:11.5px;color:var(--muted);}
+
+  .profile{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  .profile-left{display:flex;align-items:center;gap:14px;}
+  .profile-avatar{
+    width:52px;height:52px;border-radius:14px;display:grid;place-items:center;
+    font-size:16px;font-weight:800;color:#2F7A63;
+    background:linear-gradient(135deg,#E6F8F1,#CDEFE2);border:1px solid var(--primary-line);
+  }
+  .profile-name{font-size:16px;font-weight:700;}
+  .profile-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .profile-stats{display:flex;gap:26px;}
+  .pstat{display:flex;flex-direction:column;}
+  .pstat-num{font-size:19px;font-weight:800;color:#2F6F5B;line-height:1.3;}
+  .pstat-label{font-size:10.5px;color:var(--muted);}
+
+  .progress-line{display:flex;align-items:center;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
+  .progress-line .label{font-size:11.5px;color:var(--muted);}
+  .progress-track{flex:1;height:8px;border-radius:99px;background:#EDF5F2;overflow:hidden;}
+  .progress-track span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8FD8C1,#4FA98E);transition:width .35s;}
+  .progress-val{font-size:11.5px;font-weight:700;color:#2F6F5B;}
+
+  .filter-chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{
+    padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;
+    font-size:12px;color:#5C7A71;cursor:pointer;transition:all .18s;
+  }
+  .chip:hover{border-color:var(--primary-line);color:var(--primary-deep);}
+  .chip.is-active{background:var(--primary-soft);border-color:var(--primary-line);color:#1F6B55;font-weight:700;}
+
+  .advice-item{
+    border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:12px;
+    background:#fff;transition:border-color .2s,box-shadow .2s;
+  }
+  .advice-item:hover{border-color:var(--primary-line);box-shadow:0 4px 14px rgba(60,120,105,.06);}
+  .advice-item.is-done{background:#FAFEFC;border-color:#DDF0E8;opacity:.92;}
+  .advice-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;}
+  .prio{
+    flex:0 0 auto;padding:2px 9px;border-radius:6px;font-size:10.5px;font-weight:700;margin-top:2px;
+  }
+  .prio--high{background:#FCEAEA;color:#A85A5A;}
+  .prio--mid{background:#FFF4E3;color:#A87A2E;}
+  .prio--low{background:#EAF3FF;color:#2D6FD0;}
+  .advice-title{font-size:13.5px;font-weight:700;color:#2F4A44;}
+  .advice-item.is-done .advice-title{text-decoration:line-through;color:#8FA8A1;}
+  .advice-body{margin:0 0 8px 0;font-size:12.5px;line-height:1.8;color:#4B615B;}
+  .advice-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+  .tag-soft{
+    padding:1px 9px;border-radius:6px;background:#F2FAF7;color:#4E7A6C;
+    font-size:10.5px;font-weight:600;
+  }
+  .tag-topic{background:#EAF3FF;color:#2D6FD0;}
+  .advice-actions{display:flex;align-items:center;gap:10px;}
+  .mini-btn{
+    padding:5px 12px;border-radius:7px;border:1px solid var(--line);background:#fff;
+    font-size:11.5px;color:#5C7A71;cursor:pointer;transition:all .18s;
+  }
+  .mini-btn:hover{border-color:var(--primary);color:var(--primary-deep);}
+  .mini-btn.is-active{background:var(--primary-soft);border-color:var(--primary-line);color:#1F6B55;font-weight:700;}
+
+  .evidence{margin-top:10px;}
+  .evidence summary{
+    cursor:pointer;font-size:11.5px;color:#5C7A71;font-weight:600;
+    list-style:none;user-select:none;padding:2px 0;
+  }
+  .evidence summary::-webkit-details-marker{display:none;}
+  .evidence summary::before{content:'▸';display:inline-block;margin-right:5px;font-size:10px;color:var(--primary);transition:transform .2s;}
+  .evidence[open] summary::before{transform:rotate(90deg);}
+  .evidence-body{
+    margin-top:8px;padding:10px 12px;border-radius:10px;
+    background:#F7FCFA;border:1px dashed #D5EBE3;font-size:12px;line-height:1.85;color:#4B615B;
+  }
+  .evidence-body b{color:#2F6F5B;}
+  .bar-row{display:flex;align-items:center;gap:8px;margin-top:5px;}
+  .bar-name{width:130px;flex:0 0 130px;font-size:11px;color:#5C7A71;}
+  .bar-track{flex:1;height:6px;border-radius:99px;background:#E9F3EF;overflow:hidden;}
+  .bar-track span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8FD8C1,#4FA98E);}
+  .bar-track span.is-low{background:linear-gradient(90deg,#F3C98B,#DCA254);}
+  .bar-val{width:42px;text-align:right;font-size:11px;font-weight:700;color:#2F6F5B;}
+
+  .empty{
+    text-align:center;padding:36px 16px;color:var(--muted);font-size:12.5px;
+    border:1px dashed var(--line);border-radius:12px;background:#FBFEFC;
+  }
+
+  @keyframes spinOnce{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .spin{display:inline-block;animation:spinOnce .8s linear infinite;}
+
+  @media (max-width:1080px){
+    .profile-stats{gap:18px;}
+  }
+  @media (max-width:860px){
+    .layout{flex-direction:column;padding:0 16px 32px;}
+    .sidebar{width:100%;flex:none;border-right:0;border-bottom:1px solid var(--line);padding:16px 0;position:static;max-height:none;}
+    .main{padding:16px 0 0;}
+    .topbar-inner{padding:0 16px;gap:12px;}
+    .nav-link{padding:8px 9px;font-size:12.5px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../shouye/index.html">
+        <span class="brand-logo"><img src="../chuangtu/logo.jpg" alt="数小伴 Logo"></span>
+        <span class="brand-name">数小伴</span>
+      </a>
+      <nav class="mainnav" aria-label="主导航">
+        <a class="nav-link" href="../shouye/index.html"><span class="ico">🏠</span>首页</a>
+        <a class="nav-link" href="../xuexishuli/index.html"><span class="ico">📚</span>学习梳理</a>
+        <a class="nav-link" href="../xueqingfenxi/index.html"><span class="ico">📈</span>学情分析</a>
+        <a class="nav-link is-active" href="../xuexijianyi/index.html"><span class="ico">💡</span>学习建议</a>
+        <a class="nav-link" href="../anlihedui/index.html"><span class="ico">🧾</span>案例核对</a>
+        <a class="nav-link" href="#"><span class="ico">⚙️</span>设置</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-brand">
+        <img src="../chuangtu/logo.jpg" alt="">
+        <span>数小伴</span>
+      </div>
+
+      <nav class="side-menu">
+        <button class="side-item" type="button" @click="go('../xuexishuli/index.html')"><span class="ico">📚</span>学习梳理</button>
+        <button class="side-item" type="button" @click="go('../xueqingfenxi/index.html')"><span class="ico">📈</span>学情分析</button>
+        <button class="side-item is-active" type="button"><span class="ico">💡</span>学习建议</button>
+        <button class="side-item" type="button" @click="go('../anlihedui/index.html')"><span class="ico">🧾</span>案例核对</button>
+      </nav>
+
+      <div class="side-tools">
+        <div>
+          <div class="field-label"><span class="ico">🏫</span>班级编号</div>
+          <select class="side-select" v-model="classCode">
+            <option value="DC01">DC01</option>
+            <option value="DC02">DC02</option>
+          </select>
+        </div>
+        <div>
+          <div class="field-label"><span class="ico">👦</span>学生ID</div>
+          <select class="side-select" v-model="studentId">
+            <option v-for="s in studentIds" :key="s" :value="s">{{ s }}</option>
+          </select>
+        </div>
+        <div>
+          <div class="field-label"><span class="ico">🧭</span>建议类型</div>
+          <select class="side-select" v-model="typeFilter">
+            <option value="all">全部类型</option>
+            <option value="knowledge">知识补强</option>
+            <option value="practice">练习安排</option>
+            <option value="habit">学习习惯</option>
+          </select>
+        </div>
+        <button class="tool-btn tool-btn--primary" type="button" @click="regenerate">
+          <span :class="{spin:thinking}">✦</span> 重新生成建议
+        </button>
+        <button class="tool-btn" type="button" @click="go('../xueqingfenxi/index.html')">📈 查看学情分析</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">学习建议</h1>
+          <p class="page-sub">依据学情证据生成可执行建议，做到有据可查</p>
+        </div>
+        <div class="head-meta"><i class="meta-dot"></i>{{ classCode }} · {{ studentId }} · 共 {{ advices.length }} 条建议</div>
+      </div>
+
+      <section class="card">
+        <div class="profile">
+          <div class="profile-left">
+            <div class="profile-avatar">{{ studentId }}</div>
+            <div>
+              <div class="profile-name">{{ studentId }}</div>
+              <div class="profile-sub">{{ classCode }} · 七年级数学 · 当前主题：{{ weakestTopicName }}</div>
+            </div>
+          </div>
+          <div class="profile-stats">
+            <div class="pstat">
+              <span class="pstat-num">{{ avgRate }}%</span>
+              <span class="pstat-label">平均得分率</span>
+            </div>
+            <div class="pstat">
+              <span class="pstat-num">{{ weakMetrics.length }}</span>
+              <span class="pstat-label">薄弱指标</span>
+            </div>
+            <div class="pstat">
+              <span class="pstat-num">{{ strongMetrics.length }}</span>
+              <span class="pstat-label">优势指标</span>
+            </div>
+          </div>
+        </div>
+        <div class="progress-line">
+          <span class="label">建议完成度</span>
+          <span class="progress-track"><span :style="{ width: donePercent + '%' }"></span></span>
+          <span class="progress-val">{{ doneCount }} / {{ advices.length }}</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2 class="card-title"><i></i>个性化建议</h2>
+          <div class="filter-chips">
+            <button class="chip" :class="{ 'is-active': typeFilter === 'all' }" type="button" @click="typeFilter = 'all'">全部</button>
+            <button class="chip" :class="{ 'is-active': typeFilter === 'knowledge' }" type="button" @click="typeFilter = 'knowledge'">知识补强</button>
+            <button class="chip" :class="{ 'is-active': typeFilter === 'practice' }" type="button" @click="typeFilter = 'practice'">练习安排</button>
+            <button class="chip" :class="{ 'is-active': typeFilter === 'habit' }" type="button" @click="typeFilter = 'habit'">学习习惯</button>
+          </div>
+        </div>
+
+        <div v-if="visibleAdvices.length === 0" class="empty">当前筛选下暂无建议</div>
+
+        <div
+          v-for="(item, idx) in visibleAdvices"
+          :key="item.id"
+          class="advice-item"
+          :class="{ 'is-done': item.done }">
+          <div class="advice-top">
+            <span class="prio" :class="'prio--' + item.priorityLevel">{{ item.priorityText }}</span>
+            <div>
+              <div class="advice-title">{{ item.title }}</div>
+            </div>
+          </div>
+          <p class="advice-body">{{ item.body }}</p>
+          <div class="advice-meta">
+            <span class="tag-soft tag-topic">{{ item.topicLabel }}</span>
+            <span class="tag-soft">{{ item.typeText }}</span>
+            <span class="tag-soft">{{ item.relatedMetric }}</span>
+            <span class="tag-soft">当前 {{ item.rate.toFixed(1) }}%</span>
+          </div>
+          <div class="advice-actions">
+            <button class="mini-btn" :class="{ 'is-active': item.done }" type="button" @click="toggleDone(item)">
+              {{ item.done ? '✓ 已完成' : '标记完成' }}
+            </button>
+            <button class="mini-btn" type="button" @click="goPractice">去练习</button>
+          </div>
+
+          <details class="evidence">
+            <summary>查看依据（指标与得分明细）</summary>
+            <div class="evidence-body">
+              <p style="margin:0 0 6px;">判断依据：该生在本主题相关指标上的得分率如下，<b>{{ item.relatedMetric }}</b> 明显低于达标线 60%。</p>
+              <div v-for="m in item.evidence" :key="m.key" class="bar-row">
+                <span class="bar-name">{{ m.label }}</span>
+                <span class="bar-track"><span :class="{ 'is-low': m.value < 50 }" :style="{ width: Math.min(100, m.value) + '%' }"></span></span>
+                <span class="bar-val">{{ m.value.toFixed(0) }}%</span>
+              </div>
+              <p style="margin:8px 0 0;color:#6C837C;">
+                关联题目：{{ item.relatedQuestions }} ·
+                证据来源：<b>{{ classCode }} / {{ studentId }}</b> 学习记录
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2 class="card-title"><i></i>建议执行路径</h2>
+          <span class="card-note">按优先级依次推进</span>
+        </div>
+        <el-steps :active="stepActive" align-center finish-status="success" process-status="process">
+          <el-step title="定位薄弱点" description="依据指标得分率锁定短板" />
+          <el-step title="针对性补强" description="按建议完成知识回顾与练习" />
+          <el-step title="复测验证" description="重新采集记录确认提升" />
+        </el-steps>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script src="../xuexishuli/vendor/vue.global.prod.js"></script>
+<script src="../xuexishuli/vendor/element-plus.js"></script>
+<script>
+(function(){
+  var ref = Vue.ref, computed = Vue.computed, watch = Vue.watch;
+
+  var CLASS_SCORES = {
+    DC01: { T01I1:48.10, T01I2:66.67, T01I3:50.72, T02I1:63.02, T02I2:62.09, T02I3:61.73, T03I1:60.36, T03I2:70.27, T03I3:46.67 },
+    DC02: { T01I1:57.14, T01I2:60.64, T01I3:56.86, T02I1:45.91, T02I2:51.06, T02I3:47.78, T03I1:60.42, T03I2:73.53, T03I3:41.67 }
+  };
+
+  var METRICS = [
+    { key:'T01I1', topic:'T01', label:'代数式·列式与代入' },
+    { key:'T01I2', topic:'T01', label:'整式·同类项与去括号' },
+    { key:'T01I3', topic:'T01', label:'代数式·规律与说明' },
+    { key:'T02I1', topic:'T02', label:'方程·等式性质与解' },
+    { key:'T02I2', topic:'T02', label:'方程组·消元求解' },
+    { key:'T02I3', topic:'T02', label:'方程·实际应用建模' },
+    { key:'T03I1', topic:'T03', label:'不等式·性质与解集' },
+    { key:'T03I2', topic:'T03', label:'不等式组·公共解集' },
+    { key:'T03I3', topic:'T03', label:'不等式·实际范围确定' }
+  ];
+
+  var TOPIC_NAME = { T01:'代数式与整式运算', T02:'方程与方程组', T03:'不等式与不等式组' };
+
+  var ADVICE_TEMPLATE = {
+    T01I1: { title:'补强「用代数式表示数量关系」', body:'建议先回到「列代数式」的基本流程：找出已知量与未知量 → 用字母表示 → 按运算顺序书写。每天完成 3 道列式题，并口头说出每一步含义。' },
+    T01I2: { title:'补强「同类项与去括号」', body:'去括号时先看括号前的符号，负号要逐项变号；合并同类项只合并系数、字母部分保持不变。建议做 5 道化简题并逐题标注变号过程。' },
+    T01I3: { title:'补强「代数式规律与说明」', body:'规律题先写出前几项，再用含 n 的式子表达并化简，最后用「n 为整数」说明结论。建议整理 2 道典型规律题的通法。' },
+    T02I1: { title:'补强「等式性质与一元一次方程」', body:'解方程的核心是等式两边同变：先移项、再合并、最后系数化为 1。建议每天完成 2 道解方程并验算代入。' },
+    T02I2: { title:'补强「方程组消元」', body:'选择代入或加减消元前，先观察系数是否相同或互为相反数。建议完成 3 道方程组题，并写出选择该方法的理由。' },
+    T02I3: { title:'补强「方程实际应用建模」', body:'应用题先设未知数并写清单位，再找等量关系列方程。建议整理 2 道行程/利润类题目的等量关系。' },
+    T03I1: { title:'补强「不等式性质与解集」', body:'两边同乘或同除负数时不等号方向必须改变。建议专门练习 5 道变号题，并在每一步旁标注依据。' },
+    T03I2: { title:'补强「不等式组公共解集」', body:'分别解出每个不等式后在数轴上取公共部分，注意端点是否取到。建议画数轴完成 3 道不等式组。' },
+    T03I3: { title:'补强「实际问题中的取值范围」', body:'先根据题意列出两个方向的不等式，再合并为范围，最后结合现实限制检查端点。建议完成 2 道利润/数量范围题。' }
+  };
+
+  function hash(n){
+    var x = Math.sin(n * 12.9898) * 43758.5453;
+    return x - Math.floor(x);
+  }
+
+  function studentList(cls){
+    var start = cls === 'DC01' ? 1 : 21;
+    var list = [];
+    for(var i = 0; i < 20; i++) list.push('D' + String(start + i).padStart(2, '0'));
+    return list;
+  }
+
+  function studentMetrics(cls, id){
+    var base = CLASS_SCORES[cls];
+    var idx = parseInt(id.slice(1), 10);
+    return METRICS.map(function(m){
+      var seed = idx * 97 + m.key.charCodeAt(1) * 31 + m.key.charCodeAt(3) * 17;
+      var jitter = (hash(seed) - 0.5) * 46;
+      return { key:m.key, topic:m.topic, label:m.label, value: Math.max(12, Math.min(100, base[m.key] + jitter)) };
+    });
+  }
+
+  var app = Vue.createApp({
+    setup: function(){
+      var classCode = ref('DC01');
+      var studentId = ref('D01');
+      var typeFilter = ref('all');
+      var thinking = ref(false);
+      var version = ref(0);
+      var doneIds = ref([]);
+
+      var studentIds = computed(function(){ return studentList(classCode.value); });
+
+      watch(classCode, function(){
+        studentId.value = studentList(classCode.value)[0];
+      });
+
+      var metrics = computed(function(){
+        // version 参与计算，便于“重新生成”时刷新
+        return version.value >= 0 ? studentMetrics(classCode.value, studentId.value) : [];
+      });
+
+      var sortedMetrics = computed(function(){
+        return metrics.value.slice().sort(function(a, b){ return a.value - b.value; });
+      });
+
+      var weakMetrics = computed(function(){
+        return sortedMetrics.value.filter(function(m){ return m.value < 55; }).slice(0, 3);
+      });
+
+      var strongMetrics = computed(function(){
+        return sortedMetrics.value.filter(function(m){ return m.value >= 65; });
+      });
+
+      var avgRate = computed(function(){
+        if(!metrics.value.length) return '0.0';
+        return (metrics.value.reduce(function(s, m){ return s + m.value; }, 0) / metrics.value.length).toFixed(1);
+      });
+
+      var weakestTopicName = computed(function(){
+        var arr = sortedMetrics.value;
+        if(!arr.length) return '—';
+        return TOPIC_NAME[arr[0].topic];
+      });
+
+      var advices = computed(function(){
+        var list = [];
+        var pool = weakMetrics.value.length ? weakMetrics.value : sortedMetrics.value.slice(0, 2);
+        pool.forEach(function(m, i){
+          var tpl = ADVICE_TEMPLATE[m.key] || { title:'补强「' + m.label + '」', body:'建议针对该指标进行专项练习，并在完成后重新记录以便复测。' };
+          var id = studentId.value + '-' + m.key;
+          list.push({
+            id: id,
+            type: 'knowledge',
+            typeText: '知识补强',
+            topicLabel: TOPIC_NAME[m.topic],
+            relatedMetric: m.label,
+            rate: m.value,
+            priorityLevel: m.value < 45 ? 'high' : (m.value < 55 ? 'mid' : 'low'),
+            priorityText: m.value < 45 ? '高优先级' : (m.value < 55 ? '中优先级' : '低优先级'),
+            title: tpl.title,
+            body: tpl.body,
+            evidence: metrics.value.filter(function(x){ return x.topic === m.topic; }),
+            relatedQuestions: m.topic === 'T01' ? 'Q001–Q018 中的对应题组' : (m.topic === 'T02' ? 'Q019–Q036 中的对应题组' : 'Q037–Q054 中的对应题组'),
+            done: doneIds.value.indexOf(id) !== -1
+          });
+        });
+
+        var second = sortedMetrics.value[1] || sortedMetrics.value[0];
+        if(second){
+          var pid = studentId.value + '-practice';
+          list.push({
+            id: pid,
+            type: 'practice',
+            typeText: '练习安排',
+            topicLabel: TOPIC_NAME[second.topic],
+            relatedMetric: second.label,
+            rate: second.value,
+            priorityLevel: 'mid',
+            priorityText: '中优先级',
+            title:'安排分层练习：先基础后变式',
+            body:'建议先用 10 分钟完成 3 道基础题确保方法熟练，再挑战 2 道变式题。练习后对照参考答案核对每一步，重点检查符号与单位。',
+            evidence: metrics.value.filter(function(x){ return x.topic === second.topic; }),
+            relatedQuestions:'基础题优先，变式题选做',
+            done: doneIds.value.indexOf(pid) !== -1
+          });
+        }
+
+        var hid = studentId.value + '-habit';
+        list.push({
+          id: hid,
+          type: 'habit',
+          typeText: '学习习惯',
+          topicLabel: '通用',
+          relatedMetric: '错题回顾',
+          rate: Number(avgRate.value),
+          priorityLevel: 'low',
+          priorityText: '低优先级',
+          title:'建立错题本并每周复盘',
+          body:'把做错的题按「知识点 + 错因」分类记录，每周固定 20 分钟回看。错因建议标注为：概念不清、符号错误、计算失误、审题遗漏。',
+          evidence: metrics.value.slice().sort(function(a, b){ return a.value - b.value; }).slice(0, 3),
+          relatedQuestions:'历史错题记录',
+          done: doneIds.value.indexOf(hid) !== -1
+        });
+
+        return list;
+      });
+
+      var visibleAdvices = computed(function(){
+        if(typeFilter.value === 'all') return advices.value;
+        return advices.value.filter(function(a){ return a.type === typeFilter.value; });
+      });
+
+      var doneCount = computed(function(){
+        return advices.value.filter(function(a){ return a.done; }).length;
+      });
+
+      var donePercent = computed(function(){
+        if(!advices.value.length) return 0;
+        return Math.round(doneCount.value / advices.value.length * 100);
+      });
+
+      var stepActive = computed(function(){
+        if(doneCount.value >= advices.value.length) return 3;
+        if(doneCount.value > 0) return 2;
+        return 1;
+      });
+
+      function toggleDone(item){
+        var i = doneIds.value.indexOf(item.id);
+        if(i === -1) doneIds.value = doneIds.value.concat([item.id]);
+        else doneIds.value = doneIds.value.filter(function(x){ return x !== item.id; });
+        ElementPlus.ElMessage({ message: item.done ? '已取消完成标记' : '已标记完成：' + item.title, type:'success', customClass:'soft-msg' });
+      }
+
+      function regenerate(){
+        thinking.value = true;
+        setTimeout(function(){
+          version.value++;
+          doneIds.value = [];
+          thinking.value = false;
+          ElementPlus.ElMessage({ message:'已根据最新学情重新生成建议', type:'success', customClass:'soft-msg' });
+        }, 600);
+      }
+
+      function go(url){ window.location.href = url; }
+      function goPractice(){ window.location.href = '../xuexishuli/index.html'; }
+
+      return {
+        classCode: classCode,
+        studentId: studentId,
+        studentIds: studentIds,
+        typeFilter: typeFilter,
+        thinking: thinking,
+        advices: advices,
+        visibleAdvices: visibleAdvices,
+        weakMetrics: weakMetrics,
+        strongMetrics: strongMetrics,
+        avgRate: avgRate,
+        weakestTopicName: weakestTopicName,
+        doneCount: doneCount,
+        donePercent: donePercent,
+        stepActive: stepActive,
+        toggleDone: toggleDone,
+        regenerate: regenerate,
+        go: go,
+        goPractice: goPractice
+      };
+    }
+  });
+
+  app.use(ElementPlus);
+  app.mount('#app');
+})();
+</script>
+</body>
 </html>
