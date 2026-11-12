@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/首页/index.html"
+      "destination": "/shouye/index.html"
     }
   ]
 }
