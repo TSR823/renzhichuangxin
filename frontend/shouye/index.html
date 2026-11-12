@@ -1410,7 +1410,7 @@
 <header class="topbar">
   <div class="topbar-inner">
     <button class="brand" type="button" id="brandLink" aria-haspopup="true" aria-expanded="false" aria-controls="agentPopover" title="点击查看智能体说明">
-      <span class="brand-logo"><img src="../创图/logo.jpg" alt="数小伴 Logo"></span>
+      <span class="brand-logo"><img src="../chuangtu/logo.jpg" alt="数小伴 Logo"></span>
       <span class="brand-name">数小伴</span>
       <span class="brand-caret" aria-hidden="true">▼</span>
     </button>
@@ -1517,7 +1517,7 @@
       </div>
       <div class="hero-card">
         <div class="hero-head">
-          <span class="hero-mascot" aria-hidden="true"><img src="../创图/logo.jpg" alt=""></span>
+          <span class="hero-mascot" aria-hidden="true"><img src="../chuangtu/logo.jpg" alt=""></span>
           <h1 class="hero-title" id="heroTitle" tabindex="0" title="点击查看智能体说明">欢迎使用「数小伴」</h1>
         </div>
       </div>
@@ -1620,6 +1620,37 @@
       </div>
       <div class="diff-box" id="diffBox"></div>
     </section>
+
+    <!-- 文件选择与内容预览 -->
+    <section class="panel" aria-label="文件内容预览" style="margin-top:20px;">
+      <!-- 这是那个用来选择文件的按钮 -->
+      <input type="file" id="pyFileInput" accept=".py,.txt,.json" />
+      <!-- 这是用来展示文件内容的地方 -->
+      <pre id="fileContent" style="background: #f4f4f4; padding: 10px; border-radius: 5px; max-height: 500px; overflow: auto;"></pre>
+    </section>
+
+    <script>
+      document.getElementById('pyFileInput').addEventListener('change', function(event) {
+        // 1. 获取你选中的文件
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // 2. 准备读取
+        const reader = new FileReader();
+
+        // 3. 当文件读取完成后，把内容显示在页面上
+        reader.onload = function(e) {
+          const content = e.target.result;
+          document.getElementById('fileContent').textContent = content;
+
+          // 如果你想在控制台里看到它，也可以 print 出来
+          console.log("读取到的后端代码是：", content);
+        };
+
+        // 4. 开始读取（按纯文本读取）
+        reader.readAsText(file, 'UTF-8');
+      });
+    </script>
 
     <!-- 页脚 -->
     <footer class="footer">
@@ -2057,11 +2088,11 @@
         return;
       }
       if(page === '学习梳理'){
-        window.location.href = '../学习梳理/index.html';
+        window.location.href = '../xuexishuli/index.html';
         return;
       }
       if(page === '案例核对'){
-        window.location.href = '../案例核对/index.html';
+        window.location.href = '../anlihedui/index.html';
         return;
       }
       toast('「' + page + '」页面建设中，敬请期待');
@@ -2074,11 +2105,11 @@
     link.addEventListener('click', function(event){
       event.preventDefault();
       if(link.dataset.module === '学习梳理'){
-        window.location.href = '../学习梳理/index.html';
+        window.location.href = '../xuexishuli/index.html';
         return;
       }
       if(link.dataset.module === '案例核对'){
-        window.location.href = '../案例核对/index.html';
+        window.location.href = '../anlihedui/index.html';
         return;
       }
       sideLinks.forEach(function(item){ item.classList.remove('is-active'); });
@@ -2204,11 +2235,11 @@
     btn.addEventListener('click', function(event){
       event.preventDefault();
       if(btn.dataset.module === '学习内容梳理'){
-        window.location.href = '../学习梳理/index.html';
+        window.location.href = '../xuexishuli/index.html';
         return;
       }
       if(btn.dataset.module === '案例核对 & 证据溯源'){
-        window.location.href = '../案例核对/index.html';
+        window.location.href = '../anlihedui/index.html';
         return;
       }
       toast('「' + btn.dataset.module + '」模块建设中，敬请期待');
