@@ -1471,9 +1471,18 @@
       <div class="field-label"><span class="ico">📚</span>主题筛选</div>
       <select class="side-select" id="topicSelect" aria-label="主题筛选">
         <option value="全部主题">全部主题</option>
-        <option value="数与代数">数与代数</option>
-        <option value="图形与几何">图形与几何</option>
-        <option value="统计与概率">统计与概率</option>
+        <optgroup label="代数式与整式运算">
+          <option value="代数式与整式运算">全部 · 代数式与整式运算</option>
+        </optgroup>
+        <optgroup label="方程与方程组">
+          <option value="方程与方程组">全部 · 方程与方程组</option>
+          <option value="一元一次方程">一元一次方程</option>
+          <option value="二元一次方程组">二元一次方程组</option>
+        </optgroup>
+        <optgroup label="不等式与不等式组">
+          <option value="不等式与不等式组">全部 · 不等式与不等式组</option>
+          <option value="一元一次不等式（组）">一元一次不等式（组）</option>
+        </optgroup>
       </select>
     </div>
 
@@ -1728,10 +1737,13 @@
 (function(){
   /* ---------- 数据 ---------- */
   var TOPICS = {
-    '全部主题':   { students:40, records:806, missing:11, abnormal:2 },
-    '数与代数':   { students:40, records:322, missing:5,  abnormal:1 },
-    '图形与几何': { students:39, records:289, missing:4,  abnormal:1 },
-    '统计与概率': { students:38, records:195, missing:2,  abnormal:0 }
+    '全部主题':         { students:40, records:806, missing:11, abnormal:2 },
+    '代数式与整式运算': { students:40, records:322, missing:5,  abnormal:1 },
+    '方程与方程组':     { students:40, records:280, missing:3,  abnormal:1 },
+    '一元一次方程':     { students:39, records:160, missing:2,  abnormal:1 },
+    '二元一次方程组':   { students:39, records:120, missing:1,  abnormal:0 },
+    '不等式与不等式组': { students:40, records:204, missing:3,  abnormal:0 },
+    '一元一次不等式（组）': { students:40, records:204, missing:3, abnormal:0 }
   };
 
   var CLASS_DATA = [
