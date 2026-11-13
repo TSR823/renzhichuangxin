@@ -157,6 +157,7 @@
   }
   .stu-table .el-table__row{cursor:pointer;}
   .stu-table .el-table__row:hover > td{background:#F7FCFA !important;}
+  .stu-table .is-focus-row > td{background:#E8F6F1 !important;box-shadow:inset 3px 0 0 #4FA98E;}
 
   .rate-cell{display:flex;align-items:center;gap:8px;}
   .rate-num{font-size:12.5px;font-weight:700;color:#2F6F5B;min-width:46px;}
@@ -243,6 +244,13 @@
           </select>
         </div>
         <div>
+          <div class="field-label"><span class="ico">👦</span>学生ID</div>
+          <select class="side-select" v-model="studentId" aria-label="学生ID">
+            <option value="">全班（默认）</option>
+            <option v-for="s in students" :key="s.id" :value="s.id">{{ s.id }}</option>
+          </select>
+        </div>
+        <div>
           <div class="field-label"><span class="ico">📚</span>主题筛选</div>
           <select class="side-select" v-model="topic">
             <option value="all">全部主题</option>
@@ -270,29 +278,36 @@
           <h1 class="page-title">学情分析</h1>
           <p class="page-sub">按主题与指标拆解班级表现，定位薄弱环节</p>
         </div>
-        <div class="head-meta"><i class="meta-dot"></i>当前班级：{{ classCode }} · {{ students.length }} 名学生</div>
+        <div class="head-meta"><i class="meta-dot"></i>{{ classCode }} · {{ students.length }} 名学生{{ activeStudent ? ' · 当前：' + activeStudent.id : '' }}</div>
       </div>
 
       <section class="kpi-row">
         <div class="kpi">
-          <div class="kpi-label"><span>📊</span>班级平均得分率</div>
+          <div class="kpi-label"><span>📊</span>{{ scopeLabel }}平均得分率</div>
           <div class="kpi-num">{{ avgRate }}<small>%</small></div>
-          <div class="kpi-foot">九项指标加权平均</div>
+          <div class="kpi-foot">{{ activeStudent ? '该生在当前筛选指标上的平均' : '九项指标加权平均' }}</div>
         </div>
         <div class="kpi">
           <div class="kpi-label"><span>✅</span>达标指标数</div>
-          <div class="kpi-num">{{ passedCount }}<small>/ 9</small></div>
+          <div class="kpi-num">{{ passedCount }}<small>/ {{ scopeRates.length }}</small></div>
           <div class="kpi-foot">达到 {{ passLine }}% 达标线</div>
         </div>
         <div class="kpi" :class="{ 'is-warn': weakCount > 0 }">
           <div class="kpi-label"><span>⚠️</span>薄弱指标数</div>
-          <div class="kpi-num">{{ weakCount }}<small>/ 9</small></div>
+          <div class="kpi-num">{{ weakCount }}<small>/ {{ scopeRates.length }}</small></div>
           <div class="kpi-foot">低于 50%，需重点补强</div>
         </div>
         <div class="kpi">
-          <div class="kpi-label"><span>🧑‍🎓</span>达标学生</div>
-          <div class="kpi-num">{{ passedStudents }}<small>人</small></div>
-          <div class="kpi-foot">平均得分率 ≥ {{ passLine }}%</div>
+          <template v-if="activeStudent">
+            <div class="kpi-label"><span>💪</span>优势指标数</div>
+            <div class="kpi-num">{{ strongCount }}<small>项</small></div>
+            <div class="kpi-foot">得分率 ≥ 65%</div>
+          </template>
+          <template v-else>
+            <div class="kpi-label"><span>🧑‍🎓</span>达标学生</div>
+            <div class="kpi-num">{{ passedStudents }}<small>人</small></div>
+            <div class="kpi-foot">平均得分率 ≥ {{ passLine }}%</div>
+          </template>
         </div>
       </section>
 
@@ -313,6 +328,27 @@
         </div>
       </section>
 
+      <section class="card" v-if="activeStudent">
+        <div class="card-head">
+          <h2 class="card-title"><i></i>{{ activeStudent.id }} · 指标明细</h2>
+          <span class="card-note">{{ classCode }} · 平均得分率 {{ activeStudent.avg.toFixed(1) }}%</span>
+        </div>
+        <div class="stu-head">
+          <div class="stu-avatar">{{ activeStudent.id }}</div>
+          <div>
+            <div class="stu-name">{{ activeStudent.id }}</div>
+            <div class="stu-sub">{{ classCode }} · 代数式 {{ activeStudent.T01.toFixed(0) }}% · 方程 {{ activeStudent.T02.toFixed(0) }}% · 不等式 {{ activeStudent.T03.toFixed(0) }}%</div>
+          </div>
+        </div>
+        <div class="metric-list">
+          <div v-for="m in activeStudent.metrics" :key="m.key" class="metric-row">
+            <span class="metric-name">{{ m.label }}</span>
+            <span class="metric-track"><span :class="{ 'is-low': m.value < 50 }" :style="{ width: Math.min(100, m.value) + '%' }"></span></span>
+            <span class="metric-val">{{ m.value.toFixed(0) }}%</span>
+          </div>
+        </div>
+      </section>
+
       <section class="card">
         <div class="card-head">
           <h2 class="card-title"><i></i>学生明细</h2>
@@ -321,7 +357,7 @@
             <span class="card-note">{{ filteredStudents.length }} / {{ students.length }} 人</span>
           </div>
         </div>
-        <el-table :data="filteredStudents" class="stu-table" size="small" style="width:100%" @row-click="openStudent">
+        <el-table :data="filteredStudents" class="stu-table" size="small" style="width:100%" :row-class-name="rowClassName" @row-click="openStudent">
           <el-table-column prop="id" label="学生ID" width="92" />
           <el-table-column label="平均得分率" min-width="190">
             <template #default="scope">
@@ -440,6 +476,7 @@
   var app = Vue.createApp({
     setup: function(){
       var classCode = ref('DC01');
+      var studentId = ref('');
       var topic = ref('all');
       var passLine = ref(60);
       var keyword = ref('');
@@ -451,6 +488,11 @@
       var barIns = null, radarIns = null;
 
       var students = computed(function(){ return buildStudents(classCode.value); });
+
+      var activeStudent = computed(function(){
+        if(!studentId.value) return null;
+        return students.value.filter(function(s){ return s.id === studentId.value; })[0] || null;
+      });
 
       var visibleMetrics = computed(function(){
         if(topic.value === 'all') return METRICS;
@@ -464,18 +506,37 @@
         });
       });
 
+      var scopeRates = computed(function(){
+        if(activeStudent.value){
+          return activeStudent.value.metrics.filter(function(m){
+            return topic.value === 'all' || m.topic === topic.value;
+          }).map(function(m){
+            return { key:m.key, label:m.label, value:m.value };
+          });
+        }
+        return classRates.value;
+      });
+
+      var scopeLabel = computed(function(){
+        return activeStudent.value ? '该生' : '班级';
+      });
+
       var avgRate = computed(function(){
-        var arr = classRates.value;
+        var arr = scopeRates.value;
         if(!arr.length) return '0.0';
         return (arr.reduce(function(s, m){ return s + m.value; }, 0) / arr.length).toFixed(1);
       });
 
       var passedCount = computed(function(){
-        return classRates.value.filter(function(m){ return m.value >= passLine.value; }).length;
+        return scopeRates.value.filter(function(m){ return m.value >= passLine.value; }).length;
       });
 
       var weakCount = computed(function(){
-        return classRates.value.filter(function(m){ return m.value < 50; }).length;
+        return scopeRates.value.filter(function(m){ return m.value < 50; }).length;
+      });
+
+      var strongCount = computed(function(){
+        return scopeRates.value.filter(function(m){ return m.value >= 65; }).length;
       });
 
       var passedStudents = computed(function(){
@@ -491,7 +552,7 @@
 
       function renderBar(){
         if(!barIns) return;
-        var rows = classRates.value;
+        var rows = scopeRates.value;
         barIns.setOption({
           grid: { left: 12, right: 16, top: 24, bottom: 8, containLabel: true },
           tooltip: {
@@ -534,6 +595,19 @@
             return keys.reduce(function(acc, k){ return acc + s[k]; }, 0) / keys.length;
           });
         }
+        var radarData = [
+          { value: topicRates('DC01'), name: 'DC01', itemStyle: { color: '#4FA98E' }, areaStyle: { color: 'rgba(79,169,142,.22)' } },
+          { value: topicRates('DC02'), name: 'DC02', itemStyle: { color: '#9CC7B7' }, areaStyle: { color: 'rgba(156,199,183,.16)' } }
+        ];
+        if(activeStudent.value){
+          var stu = activeStudent.value;
+          radarData.push({
+            value: [stu.T01, stu.T02, stu.T03],
+            name: stu.id,
+            itemStyle: { color: '#E0A458' },
+            areaStyle: { color: 'rgba(224,164,88,.18)' }
+          });
+        }
         radarIns.setOption({
           tooltip: { trigger: 'item' },
           legend: { bottom: 0, itemWidth: 10, itemHeight: 10, textStyle: { color: '#6C837C', fontSize: 11 } },
@@ -553,10 +627,7 @@
           series: [{
             type: 'radar',
             symbolSize: 4,
-            data: [
-              { value: topicRates('DC01'), name: 'DC01', itemStyle: { color: '#4FA98E' }, areaStyle: { color: 'rgba(79,169,142,.22)' } },
-              { value: topicRates('DC02'), name: 'DC02', itemStyle: { color: '#9CC7B7' }, areaStyle: { color: 'rgba(156,199,183,.16)' } }
-            ]
+            data: radarData
           }]
         }, true);
       }
@@ -591,13 +662,30 @@
         });
       });
 
-      watch([classCode, topic, passLine], function(){
+      watch([classCode, topic, passLine, studentId], function(){
         renderBar();
         renderRadar();
       });
 
+      watch(classCode, function(){
+        studentId.value = '';
+      });
+
+      watch(studentId, function(){
+        Vue.nextTick(function(){
+          var el = document.querySelector('.stu-table .is-focus-row');
+          if(el && el.scrollIntoView) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        });
+      });
+
+      function rowClassName(params){
+        return (activeStudent.value && params.row.id === activeStudent.value.id) ? 'is-focus-row' : '';
+      }
+
       return {
         classCode: classCode,
+        studentId: studentId,
+        activeStudent: activeStudent,
         topic: topic,
         passLine: passLine,
         keyword: keyword,
@@ -608,10 +696,14 @@
         radarChart: radarChart,
         students: students,
         filteredStudents: filteredStudents,
+        scopeRates: scopeRates,
+        scopeLabel: scopeLabel,
         avgRate: avgRate,
         passedCount: passedCount,
         weakCount: weakCount,
+        strongCount: strongCount,
         passedStudents: passedStudents,
+        rowClassName: rowClassName,
         openStudent: openStudent,
         go: go,
         reload: reload
