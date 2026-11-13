@@ -110,6 +110,8 @@
     transition:background .18s,border-color .18s,color .18s,box-shadow .18s;
   }
   .tool-btn:hover{background:var(--primary);border-color:var(--primary);color:#1D4B40;box-shadow:0 4px 12px rgba(63,174,147,.28);}
+  .tool-btn--primary{background:linear-gradient(135deg,#6FC9AE,#4FA98E);border-color:#4FA98E;color:#fff;font-weight:700;box-shadow:0 3px 10px rgba(79,169,142,.28);}
+  .tool-btn--primary:hover{background:linear-gradient(135deg,#59B89C,#3E8F76);border-color:#3E8F76;color:#fff;}
 
   .main{flex:1;min-width:0;padding:20px 0 0 32px;}
   .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px;}
@@ -268,6 +270,7 @@
           </select>
         </div>
         <button class="tool-btn" type="button" @click="reload"><span :class="{spin:refreshing}">↻</span> 重载数据</button>
+        <button id="submitBtn" class="tool-btn tool-btn--primary" type="button">📝 提交成绩</button>
         <button class="tool-btn" type="button" @click="go('../xuexijianyi/index.html')">💡 查看学习建议</button>
       </div>
     </aside>
@@ -713,6 +716,52 @@
 
   app.use(ElementPlus);
   app.mount('#app');
+
+  // ===== 提交成绩（POST + 轮询） =====
+  document.getElementById('submitBtn').addEventListener('click', async () => {
+    const payload = {
+        "学生编号": "D01",
+        "材料编号": "Q015",
+        "得分": 3
+    };
+    try {
+        const res = await fetch('http://127.0.0.1:5000/api/submit_record', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+            console.log('提交成功，开始轮询接口 1');
+            startPolling();
+        } else {
+            alert('提交失败：' + result.message);
+        }
+    } catch (err) {
+        console.error('请求出错', err);
+        alert('请求出错：' + err.message + '（请确认 http://127.0.0.1:5000 后端已启动）');
+    }
+  });
+
+  function startPolling() {
+    const timer = setInterval(async () => {
+        try {
+            const res = await fetch('http://127.0.0.1:5000/api/get_feedback');
+            const data = await res.json();
+            if (data.status === 'success') {
+                clearInterval(timer);
+                updateChart(data.data);
+            }
+        } catch (err) {
+            console.error('轮询请求出错', err);
+        }
+    }, 2000);
+  }
+
+  function updateChart(data) {
+    console.log('收到反馈，更新图表：', data);
+    try { reload(); } catch (e) {}
+  }
 })();
 </script>
 </body>
