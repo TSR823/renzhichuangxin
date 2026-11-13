@@ -493,6 +493,48 @@
   /* ---------- 依赖关系图 ---------- */
   .graph-box{width:100%;height:340px;}
 
+  /* ---------- 思维导图 ---------- */
+  .mindmap-card{padding:14px 14px 10px;}
+
+  .mindmap .graph-box{height:620px;}
+
+  .mindmap-toolbar{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    padding:0 4px 10px;
+  }
+
+  .mm-btn{
+    padding:5px 13px;border-radius:8px;border:1px solid var(--line);
+    background:#fff;color:#4E6862;font-size:11.5px;cursor:pointer;
+    transition:background .18s,border-color .18s,color .18s;
+  }
+
+  .mm-btn:hover{background:var(--primary-soft);border-color:var(--primary-line);color:#1F6B55;}
+
+  .mm-hint{font-size:11px;color:var(--muted);margin-left:auto;}
+
+  .view-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    margin:0 0 12px;flex-wrap:wrap;
+  }
+
+  .view-tabs{
+    display:inline-flex;padding:3px;border-radius:10px;
+    background:#EAF6F1;border:1px solid #D8EDE5;
+  }
+
+  .view-tabs button{
+    padding:6px 16px;border:0;border-radius:8px;background:transparent;
+    font-size:12px;color:#5C7A71;cursor:pointer;transition:all .18s;
+  }
+
+  .view-tabs button.is-on{
+    background:#fff;color:#1F6B55;font-weight:700;
+    box-shadow:0 2px 6px rgba(79,169,142,.16);
+  }
+
+  .view-hint{font-size:11.5px;color:var(--muted);}
+
   .graph-legend{
     display:flex;
     align-items:center;
@@ -676,25 +718,26 @@
         :count="filteredRows.length"
         :total="rows.length"></scope-card>
 
+      <div class="view-bar">
+        <div class="view-tabs">
+          <button type="button" :class="{ 'is-on': viewMode === 'map' }" @click="viewMode = 'map'">思维导图</button>
+          <button type="button" :class="{ 'is-on': viewMode === 'list' }" @click="viewMode = 'list'">清单视图</button>
+        </div>
+        <span class="view-hint">{{ viewMode === 'map' ? '导图展示前置知识点依赖，点击节点逐层展开' : '点击任意一行查看课标原文与材料溯源' }}</span>
+      </div>
+
+      <!-- 思维导图 -->
+      <section class="card mindmap-card" v-show="viewMode === 'map'">
+        <dependency-graph :rows="filteredRows" @node-detail="openDetail"></dependency-graph>
+      </section>
+
       <!-- 结构化表格 -->
-      <section class="card table-card">
+      <section class="card table-card" v-show="viewMode === 'list'">
         <div class="card-head">
           <h2 class="card-title">结构化学习要求清单</h2>
           <span class="card-note">点击任意一行可查看课标原文与材料溯源</span>
         </div>
         <content-table :rows="filteredRows" @row-click="openDetail"></content-table>
-      </section>
-
-      <!-- 知识点依赖 -->
-      <section class="card">
-        <div class="card-head">
-          <h2 class="card-title">前置知识点依赖关系</h2>
-          <div class="graph-legend">
-            <span><i class="dot dot--start"></i>基础知识点</span>
-            <span><i class="dot dot--core"></i>核心知识点</span>
-          </div>
-        </div>
-        <dependency-graph></dependency-graph>
       </section>
 
     </main>
@@ -720,6 +763,7 @@
         ],
         topics: ['全部', '代数式与整式运算', '方程与方程组', '不等式与不等式组'],
         activeTopic: '全部',
+        viewMode: 'map',
         dialogVisible: false,
         activeRow: null,
         rows: MOCK_ROWS
@@ -975,10 +1019,30 @@
   });
 
   app.component('dependency-graph', {
+    props: {
+      rows: { type: Array, default: function(){ return []; } }
+    },
+    emits: ['node-detail'],
+    data: function(){
+      return { chart: null, activeNode: '' };
+    },
+    watch: {
+      rows: function(){
+        this.render();
+      }
+    },
     mounted: function(){
       var self = this;
       this.chart = echarts.init(this.$refs.canvas);
-      this.chart.setOption(buildGraphOption());
+      this.render();
+      this.chart.on('click', function(params){
+        var d = params.data || {};
+        if(d.kind === 'detail' && d.row){
+          self.$emit('node-detail', d.row);
+        } else if(d.kind === 'point' || d.kind === 'topic'){
+          self.activeNode = d.name;
+        }
+      });
       this.onResize = function(){ self.chart && self.chart.resize(); };
       window.addEventListener('resize', this.onResize);
     },
@@ -986,7 +1050,35 @@
       window.removeEventListener('resize', this.onResize);
       if(this.chart){ this.chart.dispose(); this.chart = null; }
     },
-    template: '<div class="graph-box" ref="canvas"></div>'
+    methods: {
+      render: function(){
+        if(!this.chart) return;
+        this.chart.setOption(buildMindmapOption(this.rows, 2), true);
+        this.activeNode = '';
+      },
+      expandAll: function(){
+        if(!this.chart) return;
+        this.chart.setOption(buildMindmapOption(this.rows, -1), true);
+      },
+      collapseAll: function(){
+        if(!this.chart) return;
+        this.chart.setOption(buildMindmapOption(this.rows, 1), true);
+      },
+      resetView: function(){
+        this.render();
+      }
+    },
+    template: [
+      '<div class="mindmap">',
+      '  <div class="mindmap-toolbar">',
+      '    <button class="mm-btn" type="button" @click="expandAll">展开全部</button>',
+      '    <button class="mm-btn" type="button" @click="collapseAll">收起分支</button>',
+      '    <button class="mm-btn" type="button" @click="resetView">重置视图</button>',
+      '    <span class="mm-hint">点击知识点展开分支，点击「课标 / 材料 / 题目」查看详情</span>',
+      '  </div>',
+      '  <div class="graph-box" ref="canvas"></div>',
+      '</div>'
+    ].join('')
   });
 
   function gradient(from, to){
@@ -996,89 +1088,122 @@
     ]);
   }
 
-  function buildGraphOption(){
-    var treeData = colorize({
-      name: '有理数运算',
-      children: [{
-        name: '代数式与整式',
-        children: [{
-          name: '一元一次方程',
-          children: [{
-            name: '一元一次不等式',
-            children: [{ name: '不等式组解集' }]
-          }, {
-            name: '二元一次方程组',
-            children: [{ name: '实际应用建模' }]
-          }]
-        }]
-      }]
-    }, 0);
+  function buildMindmapOption(rows, depth){
+    var list = (rows && rows.length) ? rows : [];
 
-    function colorize(node, depth){
-      var colors = [
-        ['#D9F6EC', '#C0EFE0'],
-        ['#B8EDDC', '#9FE4CE'],
-        ['#6FC5A9', '#5BB89C'],
-        ['#5FB69A', '#4FA98E'],
-        ['#429A80', '#378A72']
-      ];
-      var pair = colors[Math.min(depth, colors.length - 1)];
-      node.itemStyle = {
-        color: gradient(pair[0], pair[1]),
-        borderWidth: 0,
-        shadowBlur: 10,
-        shadowColor: 'rgba(98,184,155,.16)'
-      };
-      node.label = { show: true, color: depth <= 1 ? '#215146' : '#FFFFFF' };
-      if(node.children){
-        node.children.forEach(function(child){ colorize(child, depth + 1); });
-      }
-      return node;
+    var topics = [
+      { id: 'T01', name: '代数式与整式运算' },
+      { id: 'T02', name: '方程与方程组' },
+      { id: 'T03', name: '不等式与不等式组' }
+    ];
+
+    var questions = (typeof QUESTIONS !== 'undefined') ? QUESTIONS : [];
+
+    function countByTopic(tid){
+      return questions.filter(function(q){
+        return q.topicId === tid && q.matType === '题目';
+      }).length;
     }
 
+    var root = {
+      name: '七年级 · 数与代数',
+      kind: 'root',
+      itemStyle: { color: gradient('#4FA98E', '#3E8F76'), borderWidth: 0, shadowBlur: 12, shadowColor: 'rgba(79,169,142,.28)' },
+      label: { color: '#FFFFFF', fontSize: 12, fontWeight: 700 },
+      children: []
+    };
+
+    topics.forEach(function(t){
+      var tRows = list.filter(function(r){ return r.topicId === t.id; });
+      if(!tRows.length) return;
+      var tNode = {
+        name: t.name,
+        kind: 'topic',
+        topicId: t.id,
+        itemStyle: { color: gradient('#7FCFB6', '#5BB89C'), borderWidth: 0, shadowBlur: 10, shadowColor: 'rgba(98,184,155,.2)' },
+        label: { color: '#FFFFFF', fontSize: 11.5, fontWeight: 700 },
+        children: []
+      };
+      var qCount = countByTopic(t.id);
+      tRows.forEach(function(r){
+        tNode.children.push({
+          name: r.content,
+          kind: 'point',
+          row: r,
+          itemStyle: { color: '#F1FAF6', borderWidth: 1, borderColor: '#BFE5D8' },
+          label: { color: '#2F6F5B', fontSize: 11, fontWeight: 600 },
+          children: [
+            {
+              name: '📘 课标要求',
+              kind: 'detail',
+              row: r,
+              itemStyle: { color: '#EEF6FF', borderWidth: 1, borderColor: '#D6E6FA' },
+              label: { color: '#2D6FD0', fontSize: 10.5, fontWeight: 600 }
+            },
+            {
+              name: '📄 教材材料 · ' + (r.materials || '—'),
+              kind: 'detail',
+              row: r,
+              itemStyle: { color: '#F7F4FF', borderWidth: 1, borderColor: '#E4DBFA' },
+              label: { color: '#6B4FBB', fontSize: 10.5, fontWeight: 600 }
+            },
+            {
+              name: '✏️ 配套题目 ' + qCount + ' 道',
+              kind: 'detail',
+              row: r,
+              itemStyle: { color: '#FFF8EC', borderWidth: 1, borderColor: '#F5E3C3' },
+              label: { color: '#A87A2E', fontSize: 10.5, fontWeight: 600 }
+            }
+          ]
+        });
+      });
+      root.children.push(tNode);
+    });
+
     return {
-      animationDuration: 700,
+      animationDuration: 600,
+      animationDurationUpdate: 400,
       tooltip: {
         backgroundColor: '#FFFFFF',
         borderColor: '#D8EDE5',
         textStyle: { color: '#3D514D', fontSize: 12 },
-        extraCssText: 'box-shadow:0 6px 18px rgba(0,0,0,.06);border-radius:10px;'
+        extraCssText: 'box-shadow:0 6px 18px rgba(0,0,0,.06);border-radius:10px;',
+        formatter: function(p){
+          var d = p.data || {};
+          if(d.kind === 'detail') return '点击查看：' + d.row.content;
+          if(d.kind === 'point') return d.row.content + '<br/><span style="color:#8A9A95;font-size:11px;">前置：' + (d.row.prereq || '—') + '</span>';
+          if(d.kind === 'topic') return d.name;
+          return p.name;
+        }
       },
       series: [{
         type: 'tree',
-        data: [treeData],
-        orient: 'TB',
-        left: 20,
-        right: 20,
-        top: 18,
-        bottom: 18,
+        data: [root],
+        orient: 'LR',
+        left: '8%',
+        right: '24%',
+        top: 24,
+        bottom: 24,
         symbol: 'roundRect',
-        symbolSize: [118, 34],
-        initialTreeDepth: -1,
-        expandAndCollapse: false,
-        roam: false,
+        symbolSize: [146, 30],
+        initialTreeDepth: depth,
+        expandAndCollapse: true,
+        roam: true,
         edgeShape: 'curve',
-        edgeForkPosition: '58%',
-        lineStyle: {
-          color: '#BFE5D8',
-          width: 1.6,
-          curveness: 0.5
-        },
+        edgeForkPosition: '52%',
+        lineStyle: { color: '#BFE5D8', width: 1.6, curveness: 0.5 },
         label: {
           show: true,
           position: 'inside',
-          fontSize: 10.5,
+          fontSize: 11,
           fontWeight: 600,
-          color: '#FFFFFF'
+          color: '#2F6F5B',
+          width: 130,
+          overflow: 'truncate',
+          ellipsis: '…'
         },
-        leaves: {
-          label: { position: 'inside', fontSize: 10.5 }
-        },
-        emphasis: {
-          focus: 'descendant'
-        },
-        animationDuration: 700,
-        animationDurationUpdate: 500
+        leaves: { label: { position: 'inside', fontSize: 10.5 } },
+        emphasis: { focus: 'descendant' }
       }]
     };
   }
