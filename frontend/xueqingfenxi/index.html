@@ -183,6 +183,34 @@
   .metric-track span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8FD8C1,#4FA98E);}
   .metric-track span.is-low{background:linear-gradient(90deg,#F3C98B,#DCA254);}
   .metric-val{font-size:11.5px;font-weight:700;color:#2F6F5B;width:48px;text-align:right;}
+  .metric-key{display:block;font-size:10px;color:#9CB5AE;font-weight:400;margin-top:1px;}
+  .metric-done{font-size:10.5px;color:#8AA29B;background:#F2F7F5;border-radius:4px;padding:1px 6px;}
+  .metric-status{font-size:10.5px;font-weight:700;border-radius:4px;padding:1px 7px;}
+  .metric-status.is-good{background:#DFF4EA;color:#2E7F65;}
+  .metric-status.is-ok{background:#FFF0D9;color:#A87A2E;}
+  .metric-status.is-bad{background:#FBDDD5;color:#B54E3A;}
+
+  /* ---------- Advice Cards ---------- */
+  .advice-box{margin-top:14px;}
+  .advice-loading{padding:12px 14px;background:#F7FCFA;border:1px dashed #BFE5D8;border-radius:10px;font-size:12px;color:#4E6862;}
+  .advice-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+  .advice-card{border-radius:12px;padding:14px 16px;border:1px solid #E8F1ED;}
+  .advice-card--stu{background:linear-gradient(135deg,#F0FAF4,#E2F4EC);}
+  .advice-card--tea{background:linear-gradient(135deg,#FFF6EC,#FDE9CF);border-color:#F3DFBB;}
+  .advice-card h3{margin:0 0 10px;font-size:13px;font-weight:700;}
+  .advice-card--stu h3{color:#2E7F65;}
+  .advice-card--tea h3{color:#A86A1E;}
+  .advice-line{display:flex;gap:10px;margin-bottom:7px;font-size:12px;}
+  .advice-label{color:#8FA7A0;min-width:58px;flex-shrink:0;}
+  .advice-val{color:#2D453F;line-height:1.55;}
+
+  /* ---------- Table row action ---------- */
+  .row-action{
+    border:1px solid #D8EDE5;background:#F2FBF7;color:#2F6F5B;
+    border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;
+    transition:background .18s,color .18s,box-shadow .18s;
+  }
+  .row-action:hover{background:#4FA98E;color:#fff;box-shadow:0 2px 8px rgba(79,169,142,.25);}
 
   .detail-dialog .el-dialog__body{padding:16px 20px 20px;}
   .detail-dialog{border-radius:16px;}
@@ -345,9 +373,38 @@
         </div>
         <div class="metric-list">
           <div v-for="m in activeStudent.metrics" :key="m.key" class="metric-row">
-            <span class="metric-name">{{ m.label }}</span>
+            <span class="metric-name">{{ m.label }}<small class="metric-key">{{ m.key }}</small></span>
             <span class="metric-track"><span :class="{ 'is-low': m.value < 50 }" :style="{ width: Math.min(100, m.value) + '%' }"></span></span>
             <span class="metric-val">{{ m.value.toFixed(0) }}%</span>
+            <span class="metric-done" v-if="m.done != null">答 {{ m.done }} 题</span>
+            <span class="metric-status" v-if="m.status" :class="'is-' + (m.status === '良好' ? 'good' : (m.status === '一般' ? 'ok' : 'bad'))">{{ m.status }}</span>
+          </div>
+        </div>
+        <div class="advice-box" v-if="loadingProfile">
+          <div class="advice-loading">⏳ 正在从后端加载画像数据…</div>
+        </div>
+        <div class="advice-cards" v-else-if="remoteAdvice">
+          <div class="advice-card advice-card--stu">
+            <h3>🎓 给学生的建议</h3>
+            <div class="advice-line" v-if="remoteAdvice.student_view">
+              <span class="advice-label">当前状态</span>
+              <span class="advice-val">{{ remoteAdvice.student_view['当前状态'] || remoteAdvice.student_view.status || '-' }}</span>
+            </div>
+            <div class="advice-line">
+              <span class="advice-label">建议</span>
+              <span class="advice-val">{{ remoteAdvice.student_view['建议'] || remoteAdvice.student_view.advice || '-' }}</span>
+            </div>
+          </div>
+          <div class="advice-card advice-card--tea">
+            <h3>👩‍🏫 给教师的建议</h3>
+            <div class="advice-line">
+              <span class="advice-label">薄弱点</span>
+              <span class="advice-val">{{ remoteAdvice.teacher_view['薄弱点'] || remoteAdvice.teacher_view.weak_points || '-' }}</span>
+            </div>
+            <div class="advice-line">
+              <span class="advice-label">教学建议</span>
+              <span class="advice-val">{{ remoteAdvice.teacher_view['教学建议'] || remoteAdvice.teacher_view.advice || '-' }}</span>
+            </div>
           </div>
         </div>
       </section>
@@ -384,6 +441,11 @@
               <el-tag :type="scope.row.avg >= passLine ? 'success' : (scope.row.avg >= 50 ? 'warning' : 'danger')" size="small">
                 {{ scope.row.avg >= passLine ? '达标' : (scope.row.avg >= 50 ? '临界' : '待提升') }}
               </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="画像" width="100" align="center">
+            <template #default="scope">
+              <button class="row-action" type="button" @click.stop="studentId = scope.row.id; loadStudentProfile(scope.row.id)">🔍 查看画像</button>
             </template>
           </el-table-column>
         </el-table>
@@ -489,13 +551,84 @@
       var barChart = ref(null);
       var radarChart = ref(null);
       var barIns = null, radarIns = null;
+      var loadingProfile = ref(false);
+      var remoteAdvice = ref(null);
+      var remoteStudent = ref(null);
+
+      function mapRemoteMetrics(list){
+        if(!Array.isArray(list)) return null;
+        var result = [];
+        list.forEach(function(r){
+          var key = r['指标编号'] || r.key;
+          var found = METRICS.find(function(m){ return m.key === key; });
+          if(!found) return;
+          var rate = r['平均得分率'];
+          var value = (typeof rate === 'number' && rate <= 1) ? rate * 100 : (typeof rate === 'number' ? rate : 0);
+          result.push({
+            key: found.key,
+            topic: found.topic,
+            label: found.label,
+            value: value,
+            done: r['已答题数'],
+            status: r['掌握状态'] || r.status || ''
+          });
+        });
+        return result.length ? result : null;
+      }
+
+      function computeAvgs(metrics){
+        var avg = metrics.reduce(function(s,m){ return s + m.value; }, 0) / metrics.length;
+        function tAvg(t){
+          var arr = metrics.filter(function(m){ return m.topic === t; });
+          return arr.reduce(function(s,m){ return s + m.value; }, 0) / arr.length;
+        }
+        return { avg: avg, T01: tAvg('T01'), T02: tAvg('T02'), T03: tAvg('T03') };
+      }
 
       var students = computed(function(){ return buildStudents(classCode.value); });
 
       var activeStudent = computed(function(){
         if(!studentId.value) return null;
+        // 后端返回的数据优先
+        if(remoteStudent.value && remoteStudent.value.id === studentId.value){
+          return remoteStudent.value;
+        }
         return students.value.filter(function(s){ return s.id === studentId.value; })[0] || null;
       });
+
+      async function loadStudentProfile(id){
+        if(!id) return;
+        loadingProfile.value = true;
+        remoteAdvice.value = null;
+        remoteStudent.value = null;
+        try {
+          var res = await fetch('http://127.0.0.1:5000/api/student/' + encodeURIComponent(id));
+          if(!res.ok) throw new Error('HTTP ' + res.status);
+          var result = await res.json();
+          if(result.status !== 'success'){
+            ElementPlus.ElMessage({ message: '没查到该学生：' + (result.message || id), type: 'warning' });
+            return;
+          }
+          var metrics = mapRemoteMetrics(result.metrics);
+          if(metrics){
+            var avgs = computeAvgs(metrics);
+            remoteStudent.value = Object.assign({ id: id }, avgs, { metrics: metrics });
+          }
+          if(result.advice) remoteAdvice.value = result.advice;
+          ElementPlus.ElMessage({ message: '已加载 ' + id + ' 的学情画像', type: 'success', customClass: 'soft-msg' });
+        } catch (err) {
+          console.warn('loadStudentProfile 失败，使用本地模拟数据：', err.message);
+          // 后端没启动时静默 fallback，保留本地模拟
+          ElementPlus.ElMessage({
+            message: id + ' · 使用本地模拟数据（后端 http://127.0.0.1:5000 未启动）',
+            type: 'info',
+            duration: 2800,
+            customClass: 'soft-msg'
+          });
+        } finally {
+          loadingProfile.value = false;
+        }
+      }
 
       var visibleMetrics = computed(function(){
         if(topic.value === 'all') return METRICS;
@@ -674,11 +807,13 @@
         studentId.value = '';
       });
 
-      watch(studentId, function(){
+      watch(studentId, function(nv){
         Vue.nextTick(function(){
           var el = document.querySelector('.stu-table .is-focus-row');
           if(el && el.scrollIntoView) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
         });
+        if(nv) loadStudentProfile(nv);
+        else { remoteStudent.value = null; remoteAdvice.value = null; }
       });
 
       function rowClassName(params){
@@ -706,8 +841,11 @@
         weakCount: weakCount,
         strongCount: strongCount,
         passedStudents: passedStudents,
+        loadingProfile: loadingProfile,
+        remoteAdvice: remoteAdvice,
         rowClassName: rowClassName,
         openStudent: openStudent,
+        loadStudentProfile: loadStudentProfile,
         go: go,
         reload: reload
       };
