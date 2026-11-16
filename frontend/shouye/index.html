@@ -1193,6 +1193,124 @@
   .diff-fill--dc01{background:linear-gradient(90deg,#8CC7B4,#63A992);}
   .diff-fill--dc02{background:linear-gradient(90deg,#F0CB88,#D8A657);}
 
+  /* 题号级对比 */
+  .q-diff{
+    grid-column:1 / -1;
+    margin-top:4px;
+    padding-top:14px;
+    border-top:1px dashed #D6ECE3;
+  }
+
+  .q-diff-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:8px;
+  }
+
+  .q-diff-title{
+    font-size:12.5px;
+    font-weight:800;
+    color:#2C4A43;
+  }
+
+  .q-diff-title span{color:var(--mint-deep);}
+
+  .q-diff-legend{
+    display:flex;
+    gap:12px;
+    font-size:10.5px;
+    color:var(--muted);
+  }
+
+  .q-diff-legend i{
+    display:inline-block;
+    width:9px;
+    height:9px;
+    border-radius:3px;
+    margin-right:4px;
+    vertical-align:-1px;
+  }
+
+  .q-diff-legend .sw-dc01{background:linear-gradient(135deg,#8CC7B4,#63A992);}
+  .q-diff-legend .sw-dc02{background:linear-gradient(135deg,#F0CB88,#D8A657);}
+
+  .q-row{
+    display:grid;
+    grid-template-columns:52px minmax(0,1fr) minmax(0,1fr) 58px;
+    gap:10px;
+    align-items:center;
+    padding:5px 6px;
+    border-radius:7px;
+    transition:background .16s;
+  }
+
+  .q-row + .q-row{border-top:1px solid #F1F7F4;}
+
+  .q-row:not(.q-row--head):hover{background:#F4FBF8;}
+
+  .q-row--head{padding-bottom:2px;}
+
+  .q-col{
+    font-size:10px;
+    font-weight:700;
+    color:#8CA69E;
+    letter-spacing:.3px;
+  }
+
+  .q-col--end{text-align:right;}
+
+  .q-id{
+    font-size:11px;
+    font-weight:700;
+    color:#37554D;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .q-cell{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    min-width:0;
+  }
+
+  .q-track{
+    position:relative;
+    flex:1;
+    height:8px;
+    border-radius:999px;
+    background:#EDF4F1;
+    overflow:hidden;
+  }
+
+  .q-fill{
+    display:block;
+    height:100%;
+    border-radius:999px;
+  }
+
+  .q-fill--dc01{background:linear-gradient(90deg,#8CC7B4,#63A992);}
+  .q-fill--dc02{background:linear-gradient(90deg,#F0CB88,#D8A657);}
+
+  .q-val{
+    width:46px;
+    text-align:right;
+    font-size:10.5px;
+    font-weight:700;
+    color:#3C5B53;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .q-gap{
+    text-align:right;
+    font-size:10.5px;
+    font-weight:700;
+    color:#B98A3D;
+    font-variant-numeric:tabular-nums;
+  }
+
   /* 页脚 */
   .footer{margin-top:32px;}
 
@@ -2014,6 +2132,59 @@
     tipEl.style.opacity = 0;
   });
 
+  /* 题号级得分率：按指标编号归档 */
+  var QUESTION_DIFF = {
+    T02I1:[
+      { q:'Q019', a:72.73, b:45.45 },
+      { q:'Q020', a:68.18, b:50.00 },
+      { q:'Q021', a:54.55, b:40.91 },
+      { q:'Q022', a:63.64, b:47.73 },
+      { q:'Q023', a:59.09, b:43.18 },
+      { q:'Q024', a:63.64, b:50.00 },
+      { q:'Q025', a:59.09, b:40.91 },
+      { q:'Q026', a:63.24, b:49.10 }
+    ]
+  };
+
+  function renderQuestionDiff(indicatorId){
+    var list = QUESTION_DIFF[indicatorId];
+    if(!list) return '';
+
+    var html = '<div class="q-row q-row--head">' +
+      '<span></span>' +
+      '<span class="q-col">DC01</span>' +
+      '<span class="q-col">DC02</span>' +
+      '<span class="q-col q-col--end">分差</span>' +
+      '</div>';
+
+    list.forEach(function(item){
+      var gap = item.a - item.b;
+      html += '<div class="q-row">' +
+        '<span class="q-id">' + item.q + '</span>' +
+        '<span class="q-cell">' +
+          '<span class="q-track"><span class="q-fill q-fill--dc01" style="width:' + item.a + '%"></span></span>' +
+          '<span class="q-val">' + formatRate(item.a) + '%</span>' +
+        '</span>' +
+        '<span class="q-cell">' +
+          '<span class="q-track"><span class="q-fill q-fill--dc02" style="width:' + item.b + '%"></span></span>' +
+          '<span class="q-val">' + formatRate(item.b) + '%</span>' +
+        '</span>' +
+        '<span class="q-gap">+' + formatRate(gap) + '%</span>' +
+        '</div>';
+    });
+
+    return '<div class="q-diff">' +
+      '<div class="q-diff-head">' +
+        '<div class="q-diff-title">题号级对比 · <span>' + indicatorId + '</span> 关联 ' + list.length + ' 道题</div>' +
+        '<div class="q-diff-legend">' +
+          '<span><i class="sw-dc01"></i>DC01</span>' +
+          '<span><i class="sw-dc02"></i>DC02</span>' +
+        '</div>' +
+      '</div>' +
+      html +
+      '</div>';
+  }
+
   function renderDiff(){
     function bar(code, rate, tone){
       return '<div class="diff-line">' +
@@ -2034,7 +2205,8 @@
         '<p class="diff-sub">DC01 得分率: <b>' + formatRate(maxDiff.a) + '%</b><br>' +
         'DC02 得分率: <b>' + formatRate(maxDiff.b) + '%</b></p>' +
       '</div>' +
-      '<div class="diff-lines">' + bar('DC01', maxDiff.a, 'dc01') + bar('DC02', maxDiff.b, 'dc02') + '</div>';
+      '<div class="diff-lines">' + bar('DC01', maxDiff.a, 'dc01') + bar('DC02', maxDiff.b, 'dc02') + '</div>' +
+      renderQuestionDiff(maxDiff.id);
   }
 
   /* ---------- 班级数据切换 ---------- */
