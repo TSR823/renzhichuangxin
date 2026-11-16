@@ -585,6 +585,44 @@
 
   /* ---------- 配套题目 ---------- */
   .q-list{display:flex;flex-direction:column;gap:10px;padding:4px 0;}
+
+  /* 题目切换标签 */
+  .q-tabs{
+    display:inline-flex;
+    gap:4px;
+    padding:3px;
+    margin:0 0 10px;
+    border-radius:9px;
+    background:#F1F8F5;
+    border:1px solid var(--line);
+  }
+  .q-tab{
+    border:0;
+    background:transparent;
+    color:#5E7A72;
+    font-size:11.5px;
+    font-weight:600;
+    padding:5px 14px;
+    border-radius:7px;
+    cursor:pointer;
+    transition:background .18s,color .18s,box-shadow .18s;
+  }
+  .q-tab:hover{color:#2F6F5B;}
+  .q-tab.is-active{
+    background:#fff;
+    color:#2F6F5B;
+    font-weight:700;
+    box-shadow:0 1px 4px rgba(98,184,155,.18);
+  }
+  .q-tab-count{font-size:10px;color:#8CA69E;font-weight:600;margin-left:3px;}
+  .q-tab.is-active .q-tab-count{color:#63A992;}
+
+  .q-variant-tag{
+    padding:1px 8px;border-radius:5px;
+    background:#F1EDFF;color:#6B4FBB;
+    font-size:10px;font-weight:700;
+  }
+  .q-variant-from{font-size:10.5px;color:var(--muted);}
   .q-list--modal{max-height:56vh;overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:var(--primary-line) transparent;}
   .q-list--modal::-webkit-scrollbar{width:6px;}
   .q-list--modal::-webkit-scrollbar-thumb{background:var(--primary-line);border-radius:4px;}
@@ -930,6 +968,12 @@
       mode: { type: String, default: 'all' }
     },
     emits: ['update:modelValue'],
+    data: function(){
+      return { qPane: 'practice' };
+    },
+    watch: {
+      visible: function(v){ if(v) this.qPane = 'practice'; }
+    },
     computed: {
       visible: {
         get: function(){ return this.modelValue; },
@@ -939,6 +983,11 @@
         var tid = this.row && this.row.topicId;
         if(!tid || typeof QUESTIONS === 'undefined') return [];
         return QUESTIONS.filter(function(q){ return q.topicId === tid; });
+      },
+      topicVariants: function(){
+        var tid = this.row && this.row.topicId;
+        if(!tid || typeof VARIANTS === 'undefined') return [];
+        return VARIANTS.filter(function(v){ return v.topicId === tid; });
       },
       topicLabel: function(){
         var map = { T01: '代数式与整式运算', T02: '方程与方程组', T03: '不等式与不等式组' };
@@ -985,8 +1034,26 @@
           </div>
 
           <div class="block" v-if="(mode === 'all' || mode === 'questions') && topicQuestions.length">
-            <h3 class="block-title"><i></i>配套题目（共 {{ topicQuestions.length }} 道）</h3>
-            <div class="q-list q-list--modal">
+            <h3 class="block-title"><i></i>配套题目</h3>
+
+            <div class="q-tabs" v-if="mode === 'questions'">
+              <button
+                class="q-tab"
+                :class="{ 'is-active': qPane === 'practice' }"
+                type="button"
+                @click="qPane = 'practice'">
+                配套练习<span class="q-tab-count">{{ topicQuestions.length }}</span>
+              </button>
+              <button
+                class="q-tab"
+                :class="{ 'is-active': qPane === 'variant' }"
+                type="button"
+                @click="qPane = 'variant'">
+                变式题<span class="q-tab-count">{{ topicVariants.length }}</span>
+              </button>
+            </div>
+
+            <div class="q-list q-list--modal" v-if="mode !== 'questions' || qPane === 'practice'">
               <div v-for="q in topicQuestions" :key="q.qid" class="q-item">
                 <div class="q-head">
                   <span class="mono q-qid">{{ q.qid }}</span>
@@ -1018,6 +1085,32 @@
                 </details>
               </div>
             </div>
+
+            <div class="q-list q-list--modal" v-else>
+              <div v-for="v in topicVariants" :key="v.vid" class="q-item">
+                <div class="q-head">
+                  <span class="mono q-qid">{{ v.vid }}</span>
+                  <span class="q-variant-tag">{{ v.angle }}</span>
+                  <span v-if="v.qType" class="q-type" :class="'q-type--' + v.qType">{{ v.qType }}</span>
+                  <span v-if="v.fullScore" class="q-score">满分 {{ v.fullScore }} 分</span>
+                  <span class="q-variant-from">源自 {{ v.from }}</span>
+                </div>
+                <p class="q-stem">{{ v.stem }}</p>
+                <details class="q-answer">
+                  <summary>参考答案 / 解析</summary>
+                  <div class="q-ans-grid">
+                    <div class="q-ans-col">
+                      <h4>参考答案</h4>
+                      <p>{{ v.answer }}</p>
+                    </div>
+                    <div class="q-ans-col">
+                      <h4>参考解析</h4>
+                      <p>{{ v.analysis }}</p>
+                    </div>
+                  </div>
+                </details>
+              </div>
+            </div>
           </div>
 
           <div class="dialog-foot" v-if="mode !== 'questions'">
@@ -1026,7 +1119,8 @@
           </div>
           <div class="dialog-foot" v-else>
             <span>{{ row.content }}</span>
-            <span>共 {{ topicQuestions.length }} 道配套练习</span>
+            <span v-if="qPane === 'variant'">共 {{ topicVariants.length }} 道变式题</span>
+            <span v-else>共 {{ topicQuestions.length }} 道配套练习</span>
           </div>
         </template>
       </el-dialog>
@@ -2257,6 +2351,73 @@
       standardSource: '义务教育数学课程标准（2022 年版）· 第三学段「数与代数」· 课标 P63',
       materialStem: '【解答题 · 10 分】某班用不超过 500 元购买单价 30 元的笔记本和单价 45 元的钢笔共 15 件，问最多能买多少支钢笔？要求列不等式并解释取值范围。',
       sortIndex: 9
+    }
+  ];
+
+  /* 变式题：每个主题 3 道，围绕配套练习的知识点做条件替换 / 逆向设问 / 情境迁移 */
+  var VARIANTS = [
+    {
+      vid: 'V-T01-01', topicId: 'T01', from: 'Q002',
+      angle: '条件替换', qType: '填空题', fullScore: '3',
+      stem: '已知 a = 2，b = -3，求代数式 2a² - 3ab + b² 的值。',
+      answer: '35',
+      analysis: '代入时注意符号：2a² = 2×4 = 8，-3ab = -3×2×(-3) = 18，b² = 9，合计 8 + 18 + 9 = 35。'
+    },
+    {
+      vid: 'V-T01-02', topicId: 'T01', from: 'Q004',
+      angle: '逆向设问', qType: '填空题', fullScore: '3',
+      stem: '若 3x² - 2x + 1 的值为 7，求 6x² - 4x + 5 的值。',
+      answer: '17',
+      analysis: '整体代入：6x² - 4x = 2(3x² - 2x) = 2×(7 - 1) = 12，所以原式 = 12 + 5 = 17。'
+    },
+    {
+      vid: 'V-T01-03', topicId: 'T01', from: 'Q006',
+      angle: '情境迁移', qType: '解答题', fullScore: '5',
+      stem: '用黑白两种小正方形按规律拼图：第 1 个图形有 4 个白正方形，以后每个图形都比前一个多 3 个。用含 n 的式子表示第 n 个图形中白正方形的个数，并求第 10 个图形有多少个。',
+      answer: '3n + 1；第 10 个图形有 31 个',
+      analysis: '第 1 个为 4 = 3×1 + 1，每增加一个图形多 3 个，故第 n 个为 3n + 1；n = 10 时得 31 个。'
+    },
+    {
+      vid: 'V-T02-01', topicId: 'T02', from: 'Q021',
+      angle: '条件替换', qType: '解答题', fullScore: '5',
+      stem: '解方程：5(x - 2) = 3x + 4。',
+      answer: 'x = 7',
+      analysis: '去括号得 5x - 10 = 3x + 4；移项合并得 2x = 14；两边除以 2 得 x = 7。'
+    },
+    {
+      vid: 'V-T02-02', topicId: 'T02', from: 'Q023',
+      angle: '逆向设问', qType: '解答题', fullScore: '6',
+      stem: '解方程组：{ x + y = 7；2x - y = 2 }。',
+      answer: 'x = 3，y = 4',
+      analysis: '两式相加消去 y：3x = 9，x = 3；代回 x + y = 7 得 y = 4。'
+    },
+    {
+      vid: 'V-T02-03', topicId: 'T02', from: 'Q025',
+      angle: '情境迁移', qType: '解答题', fullScore: '8',
+      stem: '某班购买甲、乙两种笔记本共 20 本，甲种每本 5 元，乙种每本 3 元，共花 76 元。问甲、乙两种笔记本各买了多少本？',
+      answer: '甲种 8 本，乙种 12 本',
+      analysis: '设甲种 x 本，则乙种 20 - x 本。列方程 5x + 3(20 - x) = 76，解得 x = 8，乙种 12 本。'
+    },
+    {
+      vid: 'V-T03-01', topicId: 'T03', from: 'Q040',
+      angle: '条件替换', qType: '解答题', fullScore: '5',
+      stem: '解不等式：2x - 5 < 3x + 1。',
+      answer: 'x > -6',
+      analysis: '移项得 2x - 3x < 1 + 5，即 -x < 6；两边同乘 -1 并改变不等号方向，得 x > -6。'
+    },
+    {
+      vid: 'V-T03-02', topicId: 'T03', from: 'Q043',
+      angle: '逆向设问', qType: '解答题', fullScore: '6',
+      stem: '解不等式组：{ x - 1 ≥ 0；2x + 1 < 7 }。',
+      answer: '1 ≤ x < 3',
+      analysis: '由 x - 1 ≥ 0 得 x ≥ 1；由 2x + 1 < 7 得 x < 3。取交集得 1 ≤ x < 3。'
+    },
+    {
+      vid: 'V-T03-03', topicId: 'T03', from: 'Q048',
+      angle: '情境迁移', qType: '解答题', fullScore: '8',
+      stem: '某商品每件进价 40 元，商家希望售价不低于进价的 1.2 倍才能保证盈利，求最低售价应为多少元。',
+      answer: '48 元',
+      analysis: '设售价为 x 元，由题意 x ≥ 40 × 1.2 = 48，所以最低售价为 48 元。'
     }
   ];
 
