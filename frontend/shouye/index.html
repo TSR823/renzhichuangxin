@@ -359,6 +359,75 @@
 
   .side-btn.is-spin .ico{animation:spin .6s linear;}
 
+  /* 未选择文件时的锁定态 */
+  .side-btn:disabled,
+  .side-btn:disabled:hover{
+    background:#EEF1F0;
+    border-color:#E2E7E5;
+    color:#AFB9B6;
+    cursor:not-allowed;
+    box-shadow:none;
+  }
+
+  .side-btn:disabled .ico{opacity:.5;}
+
+  /* 数据文件选择器 */
+  .file-pick{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:9px 10px;
+    border-radius:9px;
+    border:1px dashed #C9DFD6;
+    background:#F7FCFA;
+    color:#4E6862;
+    font-size:12.5px;
+    cursor:pointer;
+    transition:background .18s,border-color .18s,color .18s;
+  }
+
+  .file-pick:hover{
+    border-color:var(--primary);
+    background:#EFFAF5;
+    color:#1D4B40;
+  }
+
+  .file-pick.is-picked{
+    border-style:solid;
+    border-color:var(--primary);
+    background:#E7F7F0;
+    color:#1D4B40;
+    font-weight:600;
+  }
+
+  .file-pick .ico{font-size:13px;}
+
+  .file-pick__text{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .file-input-hidden{
+    position:absolute;
+    width:1px;height:1px;
+    padding:0;margin:-1px;
+    overflow:hidden;
+    clip:rect(0 0 0 0);
+    white-space:nowrap;
+    border:0;
+  }
+
+  .file-hint{
+    margin:6px 0 0;
+    font-size:11px;
+    line-height:1.5;
+    color:#9AA8A4;
+  }
+
+  .file-hint.is-on{color:#2F8F71;}
+
   @keyframes spin{
     from{transform:rotate(0deg);}
     to{transform:rotate(360deg);}
@@ -1495,12 +1564,22 @@
       </select>
     </div>
 
-    <button class="side-btn" id="reloadBtn" type="button">
+    <button class="side-btn" id="reloadBtn" type="button" disabled>
       <span class="ico">↻</span>重载
     </button>
-    <button class="side-btn side-btn--soft" id="simulateBtn" type="button">
+    <button class="side-btn side-btn--soft" id="simulateBtn" type="button" disabled>
       <span class="ico">＋</span>模拟新增
     </button>
+
+    <div class="field">
+      <div class="field-label"><span class="ico">📂</span>数据文件</div>
+      <label class="file-pick" id="filePickLabel" for="pyFileInput">
+        <span class="ico" id="filePickIco">＋</span>
+        <span class="file-pick__text" id="fileNameText">选择文件</span>
+      </label>
+      <input type="file" class="file-input-hidden" id="pyFileInput" accept=".py,.txt,.json" />
+      <p class="file-hint" id="fileHint">请先选择文件，之后「重载」「模拟新增」才可点击</p>
+    </div>
 
     <div class="side-section">
       <button class="side-section-head" id="sideToggle" type="button" aria-expanded="true" aria-controls="sideLinks">
@@ -1630,19 +1709,48 @@
       <div class="diff-box" id="diffBox"></div>
     </section>
 
-    <!-- 文件选择与内容预览 -->
+    <!-- 文件内容预览 -->
     <section class="panel" aria-label="文件内容预览" style="margin-top:20px;">
-      <!-- 这是那个用来选择文件的按钮 -->
-      <input type="file" id="pyFileInput" accept=".py,.txt,.json" />
+      <div class="panel-head">
+        <div class="panel-title">📄 文件内容预览</div>
+      </div>
       <!-- 这是用来展示文件内容的地方 -->
-      <pre id="fileContent" style="background: #f4f4f4; padding: 10px; border-radius: 5px; max-height: 500px; overflow: auto;"></pre>
+      <pre id="fileContent" style="background:#f4f4f4;padding:10px;border-radius:5px;max-height:500px;overflow:auto;margin:0;">尚未选择文件。请先在左侧「数据文件」中选择 .py / .txt / .json 文件。</pre>
     </section>
 
     <script>
-      document.getElementById('pyFileInput').addEventListener('change', function(event) {
+      var pyFileInput = document.getElementById('pyFileInput');
+      var publishBtns = [document.getElementById('reloadBtn'), document.getElementById('simulateBtn')];
+      var filePickLabel = document.getElementById('filePickLabel');
+      var fileNameText = document.getElementById('fileNameText');
+      var filePickIco = document.getElementById('filePickIco');
+      var fileHint = document.getElementById('fileHint');
+
+      // 文件选择前，「重载」与「模拟新增」保持禁用
+      function setFileReady(ready){
+        publishBtns.forEach(function(btn){
+          if(!btn) return;
+          btn.disabled = !ready;
+          btn.setAttribute('aria-disabled', String(!ready));
+        });
+        filePickLabel.classList.toggle('is-picked', ready);
+        fileHint.classList.toggle('is-on', ready);
+      }
+
+      setFileReady(false);
+
+      pyFileInput.addEventListener('change', function(event) {
         // 1. 获取你选中的文件
         const file = event.target.files[0];
-        if (!file) return;
+        if (!file) {
+          setName('选择文件', '＋', false);
+          setFileReady(false);
+          return;
+        }
+
+        // 文件已选中：更新按钮文案、解除禁用
+        setName(file.name, '📄', true);
+        setFileReady(true);
 
         // 2. 准备读取
         const reader = new FileReader();
@@ -1659,6 +1767,15 @@
         // 4. 开始读取（按纯文本读取）
         reader.readAsText(file, 'UTF-8');
       });
+
+      function setName(text, ico, ready){
+        fileNameText.textContent = text;
+        filePickIco.textContent = ico;
+        fileNameText.title = text;
+        fileHint.textContent = ready
+          ? '已载入「' + text + '」，「重载」「模拟新增」已解锁'
+          : '请先选择文件，之后「重载」「模拟新增」才可点击';
+      }
     </script>
 
     <!-- 页脚 -->
