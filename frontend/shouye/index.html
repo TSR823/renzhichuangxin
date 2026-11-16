@@ -1152,7 +1152,7 @@
 
   .diff-line{
     display:grid;
-    grid-template-columns:48px minmax(0,1fr) 58px;
+    grid-template-columns:104px minmax(0,1fr) 58px;
     align-items:center;
     gap:10px;
   }
@@ -1161,6 +1161,7 @@
     font-size:11px;
     font-weight:700;
     color:#5A706B;
+    white-space:nowrap;
   }
 
   .diff-val{
@@ -2034,7 +2035,10 @@
         '<p class="diff-sub">DC01 得分率: <b>' + formatRate(maxDiff.a) + '%</b><br>' +
         'DC02 得分率: <b>' + formatRate(maxDiff.b) + '%</b></p>' +
       '</div>' +
-      '<div class="diff-lines">' + bar('DC01', maxDiff.a, 'dc01') + bar('DC02', maxDiff.b, 'dc02') + '</div>';
+      '<div class="diff-lines">' +
+        bar('DC01（' + maxDiff.id + '）', maxDiff.a, 'dc01') +
+        bar('DC02（' + maxDiff.id + '）', maxDiff.b, 'dc02') +
+      '</div>';
   }
 
   /* ---------- 班级数据切换 ---------- */
